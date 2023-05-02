@@ -6,7 +6,7 @@
 <p>
 
 [GitHub: Happy2018new]: https://img.shields.io/badge/GitHub-Happy2018new-00A1E7?style=for-the-badge
-[python]: https://img.shields.io/badge/python-3.11-AB70FF?style=for-the-badge
+[python]: https://img.shields.io/badge/python-3.8-AB70FF?style=for-the-badge
 [release]: https://img.shields.io/github/v/release/EillesWan/Musicreater?style=for-the-badge
 [license]: https://img.shields.io/badge/LICENSE-MIT-228B22?style=for-the-badge
 
