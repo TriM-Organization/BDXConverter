@@ -11,8 +11,8 @@ class Terminate(GeneralClass):
         writer.write(b'E')
 
     def UnMarshal(self, buffer: BytesIO) -> None:
-        match buffer.read(1):
-            case b'E':
-                pass
-            case _:
-                buffer.seek(-1, 1)
+        readResult = buffer.read(1)
+        if readResult == b'E':
+            pass
+        else:
+            buffer.seek(-1, 1)

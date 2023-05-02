@@ -7,31 +7,30 @@ endianWord: str = 'little'
 
 
 def getValueType(value) -> bytes:
-    match type(value):
-        case nbtlib.tag.Byte:
-            return b'\x01'
-        case nbtlib.tag.Short:
-            return b'\x02'
-        case nbtlib.tag.Int:
-            return b'\x03'
-        case nbtlib.tag.Long:
-            return b'\x04'
-        case nbtlib.tag.Float:
-            return b'\x05'
-        case nbtlib.tag.Double:
-            return b'\x06'
-        case nbtlib.tag.ByteArray:
-            return b'\x07'
-        case nbtlib.tag.String:
-            return b'\x08'
-        case nbtlib.tag.Compound:
-            return b'\x0a'
-        case nbtlib.tag.IntArray:
-            return b'\x0b'
-        case nbtlib.tag.LongArray:
-            return b'\x0c'
-        case _:
-            return b'\x09'
+    if type(value) == nbtlib.tag.Byte:
+        return b'\x01'
+    elif type(value) == nbtlib.tag.Short:
+        return b'\x02'
+    elif type(value) == nbtlib.tag.Int:
+        return b'\x03'
+    elif type(value) == nbtlib.tag.Long:
+        return b'\x04'
+    elif type(value) == nbtlib.tag.Float:
+        return b'\x05'
+    elif type(value) == nbtlib.tag.Double:
+        return b'\x06'
+    elif type(value) == nbtlib.tag.ByteArray:
+        return b'\x07'
+    elif type(value) == nbtlib.tag.String:
+        return b'\x08'
+    elif type(value) == nbtlib.tag.Compound:
+        return b'\x0a'
+    elif type(value) == nbtlib.tag.IntArray:
+        return b'\x0b'
+    elif type(value) == nbtlib.tag.LongArray:
+        return b'\x0c'
+    else:
+        return b'\x09'
 
 
 def marshalToName(writer: BytesIO, name: str) -> None:
@@ -40,27 +39,27 @@ def marshalToName(writer: BytesIO, name: str) -> None:
 
 
 def marshalToValue(writer: BytesIO, value, valueType: int) -> None:
-    match valueType:
-        case 1:
-            writer.write(value.to_bytes(length=1, byteorder=endianWord, signed=True))
-        case 2:
-            writer.write(pack(f'{endian}h', value))
-        case 3:
-            writer.write(pack(f'{endian}i', value))
-        case 4:
-            writer.write(pack(f'{endian}q', value))
-        case 5:
-            writer.write(pack(f'{endian}f', value))
-        case 6:
-            writer.write(pack(f'{endian}d', value))
-        case 7 | 11 | 12:
-            marshalToArray(writer, value, valueType)
-        case 8:
-            marshalToName(writer, str(value))
-        case 9:
-            marshalToList(writer, value)
-        case 10:
-            marshalToCompound(writer, value)
+    if valueType == 1:
+        writer.write(value.to_bytes(
+            length=1, byteorder=endianWord, signed=True))
+    elif valueType == 2:
+        writer.write(pack(f'{endian}h', value))
+    elif valueType == 3:
+        writer.write(pack(f'{endian}i', value))
+    elif valueType == 4:
+        writer.write(pack(f'{endian}q', value))
+    elif valueType == 5:
+        writer.write(pack(f'{endian}f', value))
+    elif valueType == 6:
+        writer.write(pack(f'{endian}d', value))
+    elif valueType == 7 or valueType == 11 or valueType == 12:
+        marshalToArray(writer, value, valueType)
+    elif valueType == 8:
+        marshalToName(writer, str(value))
+    elif valueType == 9:
+        marshalToList(writer, value)
+    elif valueType == 10:
+        marshalToCompound(writer, value)
 
 
 def marshalToArray(
@@ -69,15 +68,14 @@ def marshalToArray(
         valueType: int
 ) -> None:
     writer.write(pack(f'{endian}i', len(value)))
-    match valueType:
-        case 7:
-            writer.write(b''.join([pack(f'{endian}b', i) for i in value]))
-        case 11:
-            writer.write(b''.join([pack(f'{endian}i', i) for i in value]))
-        case 12:
-            writer.write(b''.join([pack(f'{endian}q', i) for i in value]))
-        case _:
-            raise TypeError
+    if valueType == 7:
+        writer.write(b''.join([pack(f'{endian}b', i) for i in value]))
+    elif valueType == 11:
+        writer.write(b''.join([pack(f'{endian}i', i) for i in value]))
+    elif valueType == 12:
+        writer.write(b''.join([pack(f'{endian}q', i) for i in value]))
+    else:
+        raise TypeError
 
 
 def marshalToList(writer: BytesIO, value) -> None:
