@@ -22,7 +22,7 @@
 `BDX Converter` 是一个轻量化的实现，它提供了基本的 `BDX` 解析、反解析、`JSON` 可视化和反可视化功能。 
 
 # 快速上手
-您可以利用 [`BDXConverter/Converter/Converter.py`]([./BDXConverter/Converter/Converter.py](https://github.com/TriM-Organization/BDXConverter/blob/main/BDXConverter/Converter/Converter.py)) 中已提供的 `4` 个函数来完成 `BDX` 文件和 `JSON` 文件的相关操作。 
+您可以利用 [`BDXConverter/Converter/Converter.py`](https://github.com/TriM-Organization/BDXConverter/blob/main/BDXConverter/Converter/Converter.py) 中已提供的 `4` 个函数来完成 `BDX` 文件和 `JSON` 文件的相关操作。 
 
 # 项目依赖
 本项目使用了 `brotli` 和 `nbtlib` 总计 `2` 个第三方库，您可以通过在 `终端` 逐一地执行以下命令以安装它们。
@@ -33,7 +33,7 @@ pip install nbtlib
 ```
 
 # 项目特性
-您可以从 [`BDXConverter/General/Pool.py`]([./BDXConverter/General/Pool.py](https://github.com/TriM-Organization/BDXConverter/blob/main/BDXConverter/General/Pool.py)) 查看本项目已支持的全部 `BDX` 操作符。
+您可以从 [`BDXConverter/General/Pool.py`](https://github.com/TriM-Organization/BDXConverter/blob/main/BDXConverter/General/Pool.py) 查看本项目已支持的全部 `BDX` 操作符。
 
 实际上，我们将每一个操作符都转换为了 `Python` 下已被实例化的类，并且每个类都有以下属性。 
 
