@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
     paths:
-      - "setup.py"
+      - "version"
   workflow_dispatch: {}
 
 permissions:
