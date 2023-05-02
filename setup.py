@@ -10,7 +10,7 @@ file.close()
 
 setuptools.setup(
     name="BDXConverter",
-    version="1.0.7",
+    version="1.0.8",
     author="Minecraft Muti-Media Organization",
     author_email="TriM-Organization@hotmail.com",
     description="A code library to marshal, unmarshal, visual and reverse visualization of BDX files",
@@ -24,5 +24,5 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=dependences,
-    python_requires='>=3.0',
+    python_requires='>=3.8',
 )
