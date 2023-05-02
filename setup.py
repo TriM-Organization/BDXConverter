@@ -2,15 +2,13 @@ import setuptools
 
 with open("requirements.txt", "r+", encoding="utf-8") as file:
     dependences = file.read().strip().split("\n")
-file.close()
-
 with open("README.md", "r+", encoding='utf-8') as file:
     long_description = file.read()
-file.close()
-
+with open("version", "r+", encoding='utf-8') as file:
+    version = file.read()
 setuptools.setup(
     name="BDXConverter",
-    version="1.0.10",
+    version=version,
     author="Minecraft Muti-Media Organization",
     author_email="TriM-Organization@hotmail.com",
     description="A code library to marshal, unmarshal, visual and reverse visualization of BDX files",
