@@ -23,6 +23,11 @@
 
 # 快速上手
 您可以利用 [`BDXConverter/Converter/Converter.py`](https://github.com/TriM-Organization/BDXConverter/blob/main/BDXConverter/Converter/Converter.py) 中已提供的 `4` 个函数来完成 `BDX` 文件和 `JSON` 文件的相关操作。 
+使用下述命令快速安装吧
+```shell
+pip install BDXConverter
+```
+> 我们建议您在 Python 3.10及其以上版本使用他,3.7及其以下版本Python不再维护更新
 
 # 项目依赖
 本项目使用了 `brotli` 和 `nbtlib` 总计 `2` 个第三方库，您可以通过在 `终端` 逐一地执行以下命令以安装它们。
