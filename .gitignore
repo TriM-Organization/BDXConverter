@@ -1,4 +1,7 @@
 .vscode
+/dist
+/build
+/BDXConverter.egg-info
 __pycache__
 *.bdx
 *.json
