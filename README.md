@@ -39,7 +39,7 @@
 
 
 # `BDX Converter`
-`BDX Converter` 是一个轻量化的纯Python实现，它提供了基本的 `BDX` 解析、反解析、`JSON` 可视化和反可视化功能。 
+`BDX Converter` 是一个轻量化的纯 `Python` 实现，它提供了基本的 `BDX` 解析、反解析、`JSON` 可视化和反可视化功能。 
 
 
 
