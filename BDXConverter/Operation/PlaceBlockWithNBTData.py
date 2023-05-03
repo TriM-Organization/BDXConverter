@@ -1,11 +1,12 @@
-import nbtlib, sys
+import nbtlib
+import sys
 from io import BytesIO
 from struct import pack, unpack
 from ..General.GeneralClass import GeneralClass
 from ..utils.getByte import getByte
 
 
-if sys.version_info.major>=3 and sys.version_info.minor>=10:
+if sys.version_info.major >= 3 and sys.version_info.minor >= 10:
     from ..utils.marshalNBT import MarshalPythonNBTObjectToWriter
     from ..utils.unmarshalNBT import UnMarshalBufferToPythonNBTObject
 else:
@@ -19,10 +20,12 @@ class PlaceBlockWithNBTData(GeneralClass):
         self.operationNumber: int = 41
         self.blockConstantStringID: int = 0
         self.blockStatesConstantStringID: int = 0
-        self.blockNBT: nbtlib.tag.Compound = nbtlib.tag.Compound({})
+        self.blockNBT: nbtlib.tag.Compound = nbtlib.tag.Compound(
+            {})  # type: ignore
 
     def Marshal(self, writer: BytesIO) -> None:
-        writer.write(pack('>H', self.blockConstantStringID) + pack('>H',self.blockStatesConstantStringID) + pack('>H', self.blockStatesConstantStringID))
+        writer.write(pack('>H', self.blockConstantStringID) + pack('>H',
+                     self.blockStatesConstantStringID) + pack('>H', self.blockStatesConstantStringID))
         MarshalPythonNBTObjectToWriter(writer, self.blockNBT, '')
 
     def UnMarshal(self, buffer: BytesIO) -> None:
