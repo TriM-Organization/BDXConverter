@@ -7,7 +7,7 @@ with open('README.md', 'r+', encoding='utf-8') as file:
     long_description = file.read()
 
 with open('version', 'r+', encoding='utf-8') as file:
-    version = file.read()
+    version = file.read().strip()
 
 setuptools.setup(
     name='BDXConverter',
