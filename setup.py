@@ -2,10 +2,13 @@ import setuptools
 
 with open("requirements.txt", "r+", encoding="utf-8") as file:
     dependences = file.read().strip().split("\n")
+
 with open("README.md", "r+", encoding='utf-8') as file:
     long_description = file.read()
+
 with open("version", "r+", encoding='utf-8') as file:
     version = file.read()
+
 setuptools.setup(
     name="BDXConverter",
     version=version,
@@ -22,5 +25,5 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=dependences,
-    python_requires='>=3.8',
+    python_requires='>=3.9',
 )

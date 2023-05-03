@@ -30,6 +30,6 @@ jobs:
     - name: Build package
       run: python -m build --sdist --wheel --outdir dist/
     - name: Publish packages
-      uses: pypa/gh-action-pypi-publish@master
+      uses: pypa/gh-action-pypi-publish@release/v1.8
       with:
         password: ${{ secrets.PIPY_API_TOKEN }}

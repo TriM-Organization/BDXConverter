@@ -15,7 +15,6 @@ def ReadBDXFile(path: str) -> tuple[list[GeneralClass], str]:
     """
     with open(path, "r+b") as file:
         fileContext: bytes = file.read()
-    file.close()
     # get the context of this bdx file
     if fileContext[0:3] != b'BD@':
         raise notAcorrectBDXFileError(path)
@@ -80,7 +79,6 @@ def DumpStructs(
     # compress writer into bytes and set outside header which named "BD@"
     with open(outputPath, 'w+b') as file:
         file.write(result)
-    file.close()
     # write bytes into a bdx file
 
 
@@ -102,7 +100,6 @@ def VisualStructs(structs: list[GeneralClass], outputPath: str) -> None:
     # get string
     with open(outputPath, 'w+', encoding='utf-8') as file:
         file.write(result)
-    file.close()
     # write json datas
 
 

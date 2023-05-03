@@ -1,10 +1,16 @@
-import nbtlib
+import nbtlib, sys
 from io import BytesIO
 from struct import pack, unpack
 from ..General.GeneralClass import GeneralClass
 from ..utils.getByte import getByte
-from ..utils.marshalNBT import MarshalPythonNBTObjectToWriter
-from ..utils.unmarshalNBT import UnMarshalBufferToPythonNBTObject
+
+
+if sys.version_info.major>=3 and sys.version_info.minor>=10:
+    from ..utils.marshalNBT import MarshalPythonNBTObjectToWriter
+    from ..utils.unmarshalNBT import UnMarshalBufferToPythonNBTObject
+else:
+    from ..utils.marshalNBT_OldVersion import MarshalPythonNBTObjectToWriter
+    from ..utils.unmarshalNBT_OldVersion import UnMarshalBufferToPythonNBTObject
 
 
 class PlaceBlockWithNBTData(GeneralClass):
@@ -16,8 +22,7 @@ class PlaceBlockWithNBTData(GeneralClass):
         self.blockNBT: nbtlib.tag.Compound = nbtlib.tag.Compound({})
 
     def Marshal(self, writer: BytesIO) -> None:
-        writer.write(pack('>H', self.blockConstantStringID) + pack('>H',
-                     self.blockStatesConstantStringID) + pack('>H', self.blockStatesConstantStringID))
+        writer.write(pack('>H', self.blockConstantStringID) + pack('>H',self.blockStatesConstantStringID) + pack('>H', self.blockStatesConstantStringID))
         MarshalPythonNBTObjectToWriter(writer, self.blockNBT, '')
 
     def UnMarshal(self, buffer: BytesIO) -> None:
