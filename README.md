@@ -55,7 +55,7 @@
 # 🐍 Pypi Packages
 我们已将此存储库以 `BDXConverter` 的名字上载到 `Pypi` ，您可以通过 `pip install BDXConverter` 快速安装。
 
-访问 [🐍 BDXConverter on Pypi](https://pypi.org/project/BDXConverter) 以了解有关此库的更多信息。
+访问 [📦 BDXConverter on Pypi](https://pypi.org/project/BDXConverter) 以了解有关此库的更多信息。
 
 我们配置了自动化 `CD/CI 工作流` ，因此如果您是本项目的 `协作者` ，您可以通过更改 `version` 文件或通过手动触发的方式启动工作流，它会自动编译本项目并将将其上载到 `Pypi` 中。
 
