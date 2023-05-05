@@ -12,19 +12,19 @@ class GeneralClass:
 
     def Marshal(self, writer: BytesIO) -> None:
         """
-        Marshal GeneralClass into the writer
+        Marshal Self@GeneralClass into the writer(io object)
         """
         ...
 
     def UnMarshal(self, buffer: BytesIO) -> None:
         """
-        Unmarshal the buffer(io object) into GeneralClass
+        Unmarshal the buffer(io object) into Self@GeneralClass
         """
         ...
 
     def Loads(self, jsonDict: dict) -> None:
         """
-        Convert jsonDict:dict into GeneralClass
+        Load datas from jsonDict:dict
         """
         if 'operationNumber' in self.__dict__:
             jsonDict['operationNumber'] = self.operationNumber
@@ -35,6 +35,6 @@ class GeneralClass:
 
     def Dumps(self) -> dict:
         """
-        Convert GeneralClass into basic dictionary
+        Convert Self@GeneralClass into the basic dictionary
         """
         return self.__dict__
