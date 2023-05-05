@@ -83,7 +83,7 @@ pip install nbtlib
 ```python
 class GeneralClass:
     """
-    Any Operation eration of the BDX file will inherit this class
+    Any operation of the BDX file will inherit this class
     """
 
     def __init__(self) -> None:
@@ -92,25 +92,30 @@ class GeneralClass:
 
     def Marshal(self, writer: BytesIO) -> None:
         """
-        Marshal GeneralClass into the writer
+        Marshal Self@GeneralClass into the writer(io object)
         """
         ...
 
     def UnMarshal(self, buffer: BytesIO) -> None:
         """
-        Unmarshal the buffer(io object) into GeneralClass
+        Unmarshal the buffer(io object) into Self@GeneralClass
         """
         ...
 
     def Loads(self, jsonDict: dict) -> None:
         """
-        Convert jsonDict:dict into GeneralClass
+        Load datas from jsonDict:dict
         """
-        ...
+        if 'operationNumber' in self.__dict__:
+            jsonDict['operationNumber'] = self.operationNumber
+            jsonDict['operationName'] = self.operationName
+        for i in self.__dict__:
+            if i in jsonDict:
+                self.__dict__[i] = jsonDict[i]
 
     def Dumps(self) -> dict:
         """
-        Convert GeneralClass into basic dictionary
+        Convert Self@GeneralClass into the basic dictionary
         """
         return self.__dict__
 ```
