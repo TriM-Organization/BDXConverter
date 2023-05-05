@@ -18,8 +18,3 @@ class PlaceBlockWithBlockStates(GeneralClass):
     def UnMarshal(self, buffer: BytesIO) -> None:
         self.blockConstantStringID = unpack('>H', getByte(buffer, 2))[0]
         self.blockStatesConstantStringID = unpack('>H', getByte(buffer, 2))[0]
-
-    def Loads(self, jsonDict: dict) -> None:
-        self.blockConstantStringID = jsonDict['blockConstantStringID'] if 'blockConstantStringID' in jsonDict else 0
-        self.blockStatesConstantStringID = jsonDict[
-            'blockStatesConstantStringID'] if 'blockStatesConstantStringID' in jsonDict else 0

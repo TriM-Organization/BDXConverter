@@ -15,6 +15,3 @@ class UseRuntimeIDPool(GeneralClass):
 
     def UnMarshal(self, buffer: BytesIO) -> None:
         self.poolId = getByte(buffer, 1)[0]
-
-    def Loads(self, jsonDict: dict) -> None:
-        self.poolId = jsonDict['poolId'] if 'poolId' in jsonDict else 0

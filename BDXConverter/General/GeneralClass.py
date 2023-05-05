@@ -26,7 +26,12 @@ class GeneralClass:
         """
         Convert jsonDict:dict into GeneralClass
         """
-        ...
+        if 'operationNumber' in self.__dict__:
+            jsonDict['operationNumber'] = self.operationNumber
+            jsonDict['operationName'] = self.operationName
+        for i in self.__dict__:
+            if i in jsonDict:
+                self.__dict__[i] = jsonDict[i]
 
     def Dumps(self) -> dict:
         """

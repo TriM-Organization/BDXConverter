@@ -25,12 +25,6 @@ class ChestSlot(GeneralClass):
         self.data = unpack('>H', getByte(buffer, 2))[0]
         self.slotID = getByte(buffer, 1)[0]
 
-    def Loads(self, jsonDict: dict) -> None:
-        self.itemName = jsonDict['itemName'] if 'itemName' in jsonDict else ''
-        self.count = jsonDict['count'] if 'count' in jsonDict else 0
-        self.data = jsonDict['data'] if 'data' in jsonDict else 0
-        self.slotID = jsonDict['slotID'] if 'slotID' in jsonDict else 0
-
 
 class ChestData(GeneralClass):
     """

@@ -15,6 +15,3 @@ class AddInt32ZValue0(GeneralClass):
 
     def UnMarshal(self, buffer: BytesIO) -> None:
         self.value = unpack('>I', getByte(buffer, 4))[0]
-
-    def Loads(self, jsonDict: dict) -> None:
-        self.value = jsonDict['value'] if 'value' in jsonDict else 0

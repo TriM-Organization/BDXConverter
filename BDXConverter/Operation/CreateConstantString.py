@@ -14,6 +14,3 @@ class CreateConstantString(GeneralClass):
 
     def UnMarshal(self, buffer: BytesIO) -> None:
         self.constantString = getString(buffer)
-
-    def Loads(self, jsonDict: dict) -> None:
-        self.constantString = jsonDict['constantString'] if 'constantString' in jsonDict else ''

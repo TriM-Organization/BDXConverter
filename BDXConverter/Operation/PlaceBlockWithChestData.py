@@ -30,7 +30,6 @@ class PlaceBlockWithChestData(GeneralClass):
     def Loads(self, jsonDict: dict) -> None:
         self.blockConstantStringID = jsonDict['blockConstantStringID'] if 'blockConstantStringID' in jsonDict else 0
         self.blockData = jsonDict['blockData'] if 'blockData' in jsonDict else 0
-        # self.slotCount = jsonDict['slotCount'] if 'slotCount' in jsonDict else 0
         newChestData = ChestData()
         if 'data' in jsonDict:
             newChestData.Loads(jsonDict['data'])

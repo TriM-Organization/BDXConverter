@@ -15,6 +15,3 @@ class PlaceRuntimeBlock(GeneralClass):
 
     def UnMarshal(self, buffer: BytesIO) -> None:
         self.runtimeId = unpack('>H', getByte(buffer, 2))[0]
-
-    def Loads(self, jsonDict: dict) -> None:
-        self.runtimeId = jsonDict['runtimeId'] if 'runtimeId' in jsonDict else 0

@@ -34,15 +34,3 @@ class PlaceRuntimeBlockWithCommandBlockDataAndUint32RuntimeID(GeneralClass):
         self.trackOutput = bool(getByte(buffer, 1)[0])
         self.conditional = bool(getByte(buffer, 1)[0])
         self.needsRedstone = bool(getByte(buffer, 1)[0])
-
-    def Loads(self, jsonDict: dict) -> None:
-        self.runtimeId = jsonDict['runtimeId'] if 'runtimeId' in jsonDict else 0
-        self.mode = jsonDict['mode'] if 'mode' in jsonDict else 0
-        self.command = jsonDict['command'] if 'command' in jsonDict else ''
-        self.customName = jsonDict['customName'] if 'customName' in jsonDict else ''
-        self.lastOutput = jsonDict['lastOutput'] if 'lastOutput' in jsonDict else ''
-        self.tickdelay = jsonDict['tickdelay'] if 'tickdelay' in jsonDict else 0
-        self.executeOnFirstTick = jsonDict['executeOnFirstTick'] if 'executeOnFirstTick' in jsonDict else True
-        self.trackOutput = jsonDict['trackOutput'] if 'trackOutput' in jsonDict else True
-        self.conditional = jsonDict['conditional'] if 'conditional' in jsonDict else False
-        self.needsRedstone = jsonDict['needsRedstone'] if 'needsRedstone' in jsonDict else False

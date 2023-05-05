@@ -27,10 +27,10 @@ class PlaceRuntimeBlockWithChestDataAndUint32RuntimeID(GeneralClass):
 
     def Loads(self, jsonDict: dict) -> None:
         self.runtimeId = jsonDict['runtimeId'] if 'runtimeId' in jsonDict else 0
-        self.slotCount = jsonDict['slotCount'] if 'slotCount' in jsonDict else 0
         newChestData = ChestData()
         if 'data' in jsonDict:
             newChestData.Loads(jsonDict['data'])
+        self.slotCount = self.data.slotCount
         self.data = newChestData
 
     def Dumps(self) -> dict:
@@ -38,7 +38,7 @@ class PlaceRuntimeBlockWithChestDataAndUint32RuntimeID(GeneralClass):
             'operationName': self.operationName,
             'operationNumber': self.operationNumber,
             'runtimeId': self.runtimeId,
-            'slotCount': self.slotCount,
+            'slotCount': len(self.data.chestData),
             'data': self.data.Dumps()
         }
         return result
