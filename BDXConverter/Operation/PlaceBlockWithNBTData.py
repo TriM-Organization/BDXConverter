@@ -36,18 +36,21 @@ class PlaceBlockWithNBTData(GeneralClass):
             buffer)
 
     def Loads(self, jsonDict: dict) -> None:
-        self.blockConstantStringID = jsonDict['blockConstantStringID'] if 'blockConstantStringID' in jsonDict else 0
-        self.blockStatesConstantStringID = jsonDict[
-            'blockStatesConstantStringID'] if 'blockStatesConstantStringID' in jsonDict else 0
-        self.blockNBT = nbtlib.parse_nbt(
-            jsonDict['blockNBT']) if 'blockNBT' in jsonDict else nbtlib.tag.Compound({})
+        if 'operationDatas' in jsonDict:
+            jsonDict = jsonDict['operationDatas']
+            self.blockConstantStringID = jsonDict['blockConstantStringID'] if 'blockConstantStringID' in jsonDict else 0
+            self.blockStatesConstantStringID = jsonDict[
+                'blockStatesConstantStringID'] if 'blockStatesConstantStringID' in jsonDict else 0
+            self.blockNBT = nbtlib.parse_nbt(
+                jsonDict['blockNBT']) if 'blockNBT' in jsonDict else nbtlib.tag.Compound({})
 
     def Dumps(self) -> dict:
-        result: dict = {
+        return {
             'operationName': self.operationName,
             'operationNumber': self.operationNumber,
-            'blockConstantStringID': self.blockConstantStringID,
-            'blockStatesConstantStringID': self.blockStatesConstantStringID,
-            'blockNBT': nbtlib.serialize_tag(self.blockNBT)
+            'operationDatas': {
+                'blockConstantStringID': self.blockConstantStringID,
+                'blockStatesConstantStringID': self.blockStatesConstantStringID,
+                'blockNBT': nbtlib.serialize_tag(self.blockNBT)
+            }
         }
-        return result

@@ -19,19 +19,22 @@ class AssignDebugData(GeneralClass):
         self.buffer = getByte(buffer, self.length)
 
     def Loads(self, jsonDict: dict) -> None:
-        self.length = jsonDict['length'] if 'length' in jsonDict else 0
-        self.buffer = b''.join(
-            [
-                i.to_bytes(length=1, byteorder='big', signed=False)
-                for i in jsonDict['buffer']
-            ]
-        ) if 'buffer' in jsonDict else b''
+        if 'operationDatas' in jsonDict:
+            jsonDict = jsonDict['operationDatas']
+            self.length = jsonDict['length'] if 'length' in jsonDict else 0
+            self.buffer = b''.join(
+                [
+                    i.to_bytes(length=1, byteorder='big', signed=False)
+                    for i in jsonDict['buffer']
+                ]
+            ) if 'buffer' in jsonDict else b''
 
     def Dumps(self) -> dict:
-        result: dict = {
+        return {
             'operationName': self.operationName,
             'operationNumber': self.operationNumber,
-            'length': self.length,
-            'buffer': [i for i in self.buffer]
+            'operationDatas': {
+                'length': self.length,
+                'buffer': [i for i in self.buffer]
+            }
         }
-        return result

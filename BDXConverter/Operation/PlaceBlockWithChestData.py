@@ -28,21 +28,24 @@ class PlaceBlockWithChestData(GeneralClass):
         self.data.UnMarshal(buffer)
 
     def Loads(self, jsonDict: dict) -> None:
-        self.blockConstantStringID = jsonDict['blockConstantStringID'] if 'blockConstantStringID' in jsonDict else 0
-        self.blockData = jsonDict['blockData'] if 'blockData' in jsonDict else 0
-        newChestData = ChestData()
-        if 'data' in jsonDict:
-            newChestData.Loads(jsonDict['data'])
-        self.slotCount = self.data.slotCount
-        self.data = newChestData
+        if 'operationDatas' in jsonDict:
+            jsonDict = jsonDict['operationDatas']
+            self.blockConstantStringID = jsonDict['blockConstantStringID'] if 'blockConstantStringID' in jsonDict else 0
+            self.blockData = jsonDict['blockData'] if 'blockData' in jsonDict else 0
+            newChestData = ChestData()
+            if 'data' in jsonDict:
+                newChestData.Loads(jsonDict['data'])
+            self.slotCount = self.data.slotCount
+            self.data = newChestData
 
     def Dumps(self) -> dict:
-        result: dict = {
+        return {
             'operationName': self.operationName,
             'operationNumber': self.operationNumber,
-            'blockConstantStringID': self.blockConstantStringID,
-            'blockData': self.blockData,
-            'slotCount': len(self.data.chestData),
-            'data': self.data.Dumps()
+            'operationDatas': {
+                'blockConstantStringID': self.blockConstantStringID,
+                'blockData': self.blockData,
+                'slotCount': len(self.data.chestData),
+                'data': self.data.Dumps()
+            }
         }
-        return result

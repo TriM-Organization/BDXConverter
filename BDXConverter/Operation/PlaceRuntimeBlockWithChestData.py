@@ -26,19 +26,22 @@ class PlaceRuntimeBlockWithChestData(GeneralClass):
         self.data.UnMarshal(buffer)
 
     def Loads(self, jsonDict: dict) -> None:
-        self.runtimeId = jsonDict['runtimeId'] if 'runtimeId' in jsonDict else 0
-        newChestData = ChestData()
-        if 'data' in jsonDict:
-            newChestData.Loads(jsonDict['data'])
-        self.slotCount = self.data.slotCount
-        self.data = newChestData
+        if 'operationDatas' in jsonDict:
+            jsonDict = jsonDict['operationDatas']
+            self.runtimeId = jsonDict['runtimeId'] if 'runtimeId' in jsonDict else 0
+            newChestData = ChestData()
+            if 'data' in jsonDict:
+                newChestData.Loads(jsonDict['data'])
+            self.slotCount = self.data.slotCount
+            self.data = newChestData
 
     def Dumps(self) -> dict:
-        result: dict = {
+        return {
             'operationName': self.operationName,
             'operationNumber': self.operationNumber,
-            'runtimeId': self.runtimeId,
-            'slotCount': len(self.data.chestData),
-            'data': self.data.Dumps()
+            'operationDatas': {
+                'runtimeId': self.runtimeId,
+                'slotCount': len(self.data.chestData),
+                'data': self.data.Dumps()
+            }
         }
-        return result

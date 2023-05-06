@@ -1,4 +1,5 @@
 from io import BytesIO
+from copy import deepcopy
 
 
 class GeneralClass:
@@ -29,12 +30,27 @@ class GeneralClass:
         if 'operationNumber' in self.__dict__:
             jsonDict['operationNumber'] = self.operationNumber
             jsonDict['operationName'] = self.operationName
-        for i in self.__dict__:
-            if i in jsonDict:
-                self.__dict__[i] = jsonDict[i]
+        if 'operationDatas' in self.__dict__:
+            for i in self.__dict__['operationDatas']:
+                if i in jsonDict:
+                    self.__dict__['operationDatas'][i] = jsonDict[i]
+        else:
+            for i in self.__dict__:
+                if i in jsonDict:
+                    self.__dict__[i] = jsonDict[i]
 
     def Dumps(self) -> dict:
         """
         Convert Self@GeneralClass into the basic dictionary
         """
-        return self.__dict__
+        if 'operationNumber' in self.__dict__:
+            copyDict = deepcopy(self.__dict__)
+            del copyDict['operationNumber']
+            del copyDict['operationName']
+            return {
+                'operationNumber': self.operationNumber,
+                'operationName': self.operationName,
+                'operationDatas': copyDict
+            }
+        else:
+            return self.__dict__

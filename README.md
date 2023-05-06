@@ -25,6 +25,7 @@
 # 目录
 - [目录](#目录)
 - [`BDX Converter`](#bdx-converter)
+- [注意事项](#注意事项)
 - [快速上手](#快速上手)
 - [🐍 Pypi Packages](#-pypi-packages)
 - [第三方依赖](#第三方依赖)
@@ -40,6 +41,13 @@
 
 # `BDX Converter`
 `BDX Converter` 是一个轻量化的纯 `Python` 实现，它提供了基本的 `BDX` 解析、反解析、`JSON` 可视化和反可视化功能。 
+
+
+
+
+
+# 注意事项
+- 版本 `1.0.16` 在可视化和反可视化字典时不兼容之前的版本
 
 
 
