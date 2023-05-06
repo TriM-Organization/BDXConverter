@@ -47,7 +47,7 @@
 
 
 # 注意事项
-- 版本 `1.0.16` 在可视化和反可视化字典时不兼容之前的版本
+- 版本 `1.0.16` 在可视化和反可视化字典方面不兼容之前的版本
 
 
 
@@ -114,18 +114,13 @@ class GeneralClass:
         """
         Load datas from jsonDict:dict
         """
-        if 'operationNumber' in self.__dict__:
-            jsonDict['operationNumber'] = self.operationNumber
-            jsonDict['operationName'] = self.operationName
-        for i in self.__dict__:
-            if i in jsonDict:
-                self.__dict__[i] = jsonDict[i]
+        ...
 
     def Dumps(self) -> dict:
         """
         Convert Self@GeneralClass into the basic dictionary
         """
-        return self.__dict__
+        ...
 ```
 
 因此，通过 `Marshal` 和 `UnMarshal` 函数，`BDX Converter` 可以自由的将 `二进制数据` 转换为 `Python Class` ，亦或转换回去。 <br/>
