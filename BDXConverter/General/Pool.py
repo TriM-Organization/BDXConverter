@@ -4,7 +4,7 @@ from .Operation import *
 
 def GetBDXCommandPool() -> dict[int, GeneralClass]:
     """
-    Return dict[commandId(..operationId):int, PythonClass:GeneralClass]
+    Return dict[commandId(operationId):int, PythonClass:GeneralClass]
     """
     return {
         1: CreateConstantString(),
