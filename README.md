@@ -7,12 +7,14 @@
 
 [GitHub: Happy2018new]: https://img.shields.io/badge/GitHub-Happy2018new-00A1E7?style=for-the-badge
 [GitHub: Inotart]: https://img.shields.io/badge/GitHub-Inotart-00A1E7?style=for-the-badge
+[Bilibili: EillesWan]: https://img.shields.io/badge/Bilibili-%E5%87%8C%E4%BA%91%E9%87%91%E7%BE%BF-00A1E7?style=for-the-badge
 [python]: https://img.shields.io/badge/python-3.9-AB70FF?style=for-the-badge
 [release]: https://img.shields.io/github/v/release/EillesWan/Musicreater?style=for-the-badge
 [license]: https://img.shields.io/badge/LICENSE-MIT-228B22?style=for-the-badge
 
 [![][GitHub: Happy2018new]](https://github.com/Happy2018new)<br/>
 [![][GitHub: Inotart]](https://github.com/Inotart)<br/>
+[![][Bilibili: EillesWan]](https://space.bilibili.com/397369002/)<br/>
 [![][python]](https://www.python.org/)<br/>
 [![][license]](LICENSE)<br/>
 

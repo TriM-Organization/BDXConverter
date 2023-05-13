@@ -94,7 +94,7 @@ class Signature(GeneralClass):
         `BDXContentWithInsideHeader: io.BytesIO` [You need to provide this while only used to signing]
             The content of BDX file with inside file header
         """
-        self.prove: str = ''
+        self.prove: str | None = None
         self.signer: str = ''
         self.signature: bytes = b''
 
@@ -112,7 +112,7 @@ class Signature(GeneralClass):
         verifier = PKCS1_v1_5.new(constantServerKey)
         # get publick key and verifier
         # note: this public key is provided from PhoenixBuilder code library
-        splitResult: list[str] = self.prove.split('::')
+        splitResult: list[str] = self.prove.split('::')  # type: ignore
         if len(splitResult) != 2:
             raise signatureError(
                 f'failed to parse prove datas; self.prove = "{self.prove}"')
@@ -155,6 +155,9 @@ class Signature(GeneralClass):
             return
         # check if need to sign this file or this is a legacy method
         # note: legacy method is officially deprecated so we cannot support this
+        if self.prove == None:
+            raise signatureError('self.prove is not assigned')
+        # check the states of self.prove
         if not 'privateSigningKeyString' in self.__dict__:
             raise signatureError('self.privateSigningKeyString is not existed')
         # check the states of self.privateSigningKeyString
@@ -162,8 +165,8 @@ class Signature(GeneralClass):
         # verification the prove
         newWriter: BytesIO = BytesIO(b'')
         newWriter.write(b'\x00\x8b')
-        newWriter.write(pack('<H', len(self.prove)))
-        newWriter.write(self.prove.encode(encoding='utf-8'))
+        newWriter.write(pack('<H', len(self.prove)))  # type: ignore
+        newWriter.write(self.prove.encode(encoding='utf-8'))  # type: ignore
         newWriter.write(
             PKCS1_v1_5.new(
                 self.loadPrivateKey()
@@ -214,6 +217,7 @@ class Signature(GeneralClass):
         # get sign content
         if getByte(signContent, 2) != b'\x00\x8b':
             self.isLegacy = True
+            self.prove = None
             self.signature = signContent.getvalue()
             return
         else:
