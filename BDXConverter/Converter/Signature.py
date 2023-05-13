@@ -267,7 +267,7 @@ class Signature(GeneralClass):
 
     def Dumps(self) -> dict:
         return {
-            'Signer': self.signer if self.signedOrNeedToSign == True else None,
+            'Signer': self.signer if self.isLegacy == False and self.signedOrNeedToSign == True else None,
             'Prove': self.prove if self.prove != '' else None,
             'Signature': self.signature.hex() if self.isLegacy == False and self.signedOrNeedToSign == True else None,
             'LegacySignBuffer': self.legacySignBuffer.hex() if self.isLegacy == True and self.signedOrNeedToSign == True else None,
