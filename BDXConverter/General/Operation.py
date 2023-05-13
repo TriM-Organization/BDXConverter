@@ -38,6 +38,5 @@ from ..Operation.PlaceRuntimeBlockWithChestDataAndUint32RuntimeID import PlaceRu
 from ..Operation.AssignDebugData import AssignDebugData
 from ..Operation.PlaceBlockWithChestData import PlaceBlockWithChestData
 from ..Operation.PlaceBlockWithNBTData import PlaceBlockWithNBTData
-from ..Operation.Terminate import Terminate
 
 from ..Operation.structOfChest import ChestSlot, ChestData

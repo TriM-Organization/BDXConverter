@@ -6,3 +6,4 @@ __pycache__
 *.bdx
 *.json
 test.py
+newtest.py

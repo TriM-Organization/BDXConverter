@@ -42,6 +42,5 @@ def GetBDXCommandPool() -> dict[int, GeneralClass]:
         38: PlaceRuntimeBlockWithChestDataAndUint32RuntimeID(),
         39: AssignDebugData(),
         40: PlaceBlockWithChestData(),
-        41: PlaceBlockWithNBTData(),
-        88: Terminate()
+        41: PlaceBlockWithNBTData()
     }

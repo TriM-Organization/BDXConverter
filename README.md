@@ -47,6 +47,7 @@
 
 
 # 注意事项
+- 版本 `1.1.0` 不兼容之前的所有版本
 - 版本 `1.0.16` 在可视化和反可视化字典方面不兼容之前的版本
 
 
@@ -54,7 +55,7 @@
 
 
 # 快速上手
-您可以利用 [`BDXConverter/Converter/Converter.py`](https://github.com/TriM-Organization/BDXConverter/blob/main/BDXConverter/Converter/Converter.py) 中已提供的 `4` 个函数来完成 `BDX` 文件和 `JSON` 文件的相关操作。 
+您可以利用 [`BDXConverter/Converter/FileOperation.py`](https://github.com/TriM-Organization/BDXConverter/blob/main/BDXConverter/Converter/FileOperation.py) 中已提供的 `4` 个函数来完成 `BDX` 文件和 `JSON` 文件的相关操作。 
 
 
 
@@ -150,7 +151,7 @@ class GeneralClass:
 
 # 待办列表
 - [ ] `API` 文档
-- [ ] 支持与 `签名` 有关的功能
+- [x] 支持与 `签名` 有关的功能
 - [ ] 可以将得到的 `Python Class` 进一步解析为建筑结构
 - [ ] 可以自由地转换 `BDX` 和其他建筑文件格式
 

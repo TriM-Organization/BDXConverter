@@ -1,132 +1,113 @@
 from ..General.GeneralClass import GeneralClass
 from ..General.Pool import GetBDXCommandPool
 from ..utils.getString import getByte, getString
-from .ConvertErrorDefine import notAcorrectBDXFileError
-from .ConvertErrorDefine import readError, unknownOperationError
+from .Signature import Signature
+from .ErrorClassDefine import headerError
+from .ErrorClassDefine import readError, unknownOperationError
 from brotli import compress, decompress
 from io import BytesIO
-from json import loads, dumps
 from copy import deepcopy
 
 
-def ReadBDXFile(path: str) -> tuple[list[GeneralClass], str]:
-    """
-    Convert BDX file into list[GeneralClass] and return the author's name
-    """
-    with open(path, "r+b") as file:
-        fileContext: bytes = file.read()
-    # get the context of this bdx file
-    if fileContext[0:3] != b'BD@':
-        raise notAcorrectBDXFileError(path)
-    buffer = BytesIO(decompress(fileContext[3:]))
-    if getByte(buffer, 3) != b'BDX':
-        raise notAcorrectBDXFileError(path)
-    # check header and create new buffer
-    result: list[GeneralClass] = []
-    bdxCommandPool: dict[int, GeneralClass] = GetBDXCommandPool()
-    # prepare
-    getByte(buffer, 1)
-    authorName = getString(buffer)
-    # get author's information
-    while True:
-        commandId = getByte(buffer, 1)
-        if commandId[0] in bdxCommandPool:
-            struct: GeneralClass = deepcopy(bdxCommandPool[commandId[0]])
-            # get struct(operation) from the pool
-            try:
-                struct.UnMarshal(buffer)
-            except EOFError:
-                raise EOFError
-            except:
-                raise readError(buffer.seek(0, 1))
-            # unmarshal bytes into python object(GeneralClass)
-            result.append(struct)
-            # submit single datas
-            if struct.operationNumber == 88:
-                break
-            # if meet operation Terminate(88)
+class BDX(GeneralClass):
+    def __init__(self) -> None:
+        """
+        `AuthorName: str`
+            The author of this BDX file
+                Note: The default value is "TriM-Organization/BDXConverter"
+        `BDXContent: list[GeneralClass]`
+            The valid contents of the BDX file
+        `Signature: Signature`
+            The signature data of the BDX file
+        """
+        self.AuthorName: str = 'TriM-Organization/BDXConverter'
+        self.BDXContent: list[GeneralClass] = []
+        self.Signature: Signature = Signature()
+
+    def Marshal(self, writer: BytesIO) -> None:
+        newWriter = BytesIO(
+            b'BDX\x00'+self.AuthorName.encode(encoding='utf-8')+b'\x00')
+        newWriter.seek(0, 2)
+        # inside header with author's name
+        for i in self.BDXContent:
+            newWriter.write(i.operationNumber.to_bytes(
+                length=1, byteorder='big', signed=False))
+            i.Marshal(newWriter)
+        # valid contents
+        if self.Signature.signedOrNeedToSign == True and self.Signature.isLegacy == False:
+            self.Signature.BDXContentWithInsideHeader = newWriter
+            self.Signature.Marshal(newWriter)
         else:
-            raise unknownOperationError(commandId[0], buffer.seek(0, 1))
-            # if we can not find the operation from the command pool
-    # read bdx file
-    return result, authorName
-    # return
+            newWriter.write(b'XE')
+        # signature
+        writer.write(b'BD@'+compress(newWriter.getvalue()))
+        # write BDX datas
 
+    def UnMarshal(self, binaryDatas: bytes) -> None:
+        if binaryDatas[0:3] != b'BD@':
+            raise headerError(binaryDatas[:3])
+        # check outside header
+        reader = BytesIO(decompress(binaryDatas[3:]))
+        # get reader to read valid contents
+        insideHeader = getByte(reader, 3)
+        if insideHeader != b'BDX':
+            raise headerError(insideHeader)
+        # check inside header
+        firstOperation = getByte(reader, 1)
+        if firstOperation != b'\x00':
+            raise unknownOperationError(firstOperation[0], reader.seek(-1, 1))
+        self.AuthorName = getString(reader)
+        # get author's name
+        BDXCommandPool: dict[int, GeneralClass] = GetBDXCommandPool()
+        # get bdx command(operation) pool
+        while True:
+            commandId = getByte(reader, 1)[0]
+            if commandId == 88:
+                break
+            elif commandId in BDXCommandPool:
+                struct: GeneralClass = deepcopy(BDXCommandPool[commandId])
+                # get struct(operation) from the pool
+                errorType = 0
+                # prepare
+                try:
+                    struct.UnMarshal(reader)
+                except EOFError:
+                    errorType = 1
+                except:
+                    errorType = 2
+                # unmarshal bytes into the struct
+                if errorType == 1:
+                    raise EOFError
+                elif errorType == 2:
+                    raise readError(reader.seek(0, 1))
+                # if meet error
+                self.BDXContent.append(struct)
+                # submit single datas
+        # read datas from reader
+        self.Signature.UnMarshal(reader)
+        # signature
 
-def DumpStructs(
-        structs: list[GeneralClass],
-        outputPath: str,
-        authorName: str = 'KazamataNeri/MCConvertExecute-bdx'
-) -> None:
-    """
-    Convert list[GeneralClass] into bytes and write it into a bdx file(outputPath:str).
+    def Loads(self, jsonDict: dict) -> None:
+        BDXCommandPool: dict[int, GeneralClass] = GetBDXCommandPool()
 
-    Note:
-        - Author's name is no need to write,
-        because this field has been officially deprecated.
-        But we still put the names into this place as symbolically
-    """
-    writer: BytesIO = BytesIO(b'')
-    # request a new writer
-    writer.write(b'BDX\x00'+authorName.encode(encoding='utf-8')+b'\x00')
-    # write inside header(BDX) and author's name
-    for i in structs:
-        writer.write(i.operationNumber.to_bytes(
-            length=1, byteorder='big', signed=False))
-        i.Marshal(writer)
-    # marshal python object into the writer
-    result = b'BD@' + compress(writer.getvalue())
-    # compress writer into bytes and set outside header which named "BD@"
-    with open(outputPath, 'w+b') as file:
-        file.write(result)
-    # write bytes into a bdx file
+        self.AuthorName = jsonDict['AuthorName'] if 'AuthorName' in jsonDict else ''
+        if 'Signature' in jsonDict:
+            self.Signature.Loads(jsonDict['Signature'])
+        if 'BDXContent' in jsonDict:
+            tmp: list[dict] = jsonDict['BDXContent']
+            for i in tmp:
+                if not 'operationNumber' in i:
+                    continue
+                if not 'operationDatas' in i:
+                    continue
+                commandId: int = i['operationNumber']
+                struct: GeneralClass = deepcopy(BDXCommandPool[commandId])
+                struct.Loads(i['operationDatas'])
+                self.BDXContent.append(struct)
 
-
-def VisualStructs(structs: list[GeneralClass], outputPath: str) -> None:
-    """
-    Convert list[GeneralClass] into json data and write it into outputPath:str
-    """
-    new: list = []
-    for i in structs:
-        new.append(i.Dumps())
-    # convert bdx file in to basic datas
-    result: str = dumps(
-        new,
-        sort_keys=True,
-        indent=4,
-        separators=(', ', ': '),
-        ensure_ascii=False
-    )
-    # get string
-    with open(outputPath, 'w+', encoding='utf-8') as file:
-        file.write(result)
-    # write json datas
-
-
-def ConvertJSONFileIntoStructs(path: str) -> list[GeneralClass]:
-    """
-    Read json datas from path:str and convert it into list[GeneralClass]
-    """
-    with open(path, 'r+', encoding='utf-8') as file:
-        fileContext: str = file.read()
-    jsonDatas: list[dict] = loads(fileContext)
-    # load json datas from file
-    result: list[GeneralClass] = []
-    bdxCommandPool: dict[int, GeneralClass] = GetBDXCommandPool()
-    # prepare
-    for i in jsonDatas:
-        if not 'operationNumber' in i:
-            continue
-        operationNumber: int = i['operationNumber']
-        if not operationNumber in bdxCommandPool:
-            continue
-        # get operation number
-        struct: GeneralClass = deepcopy(bdxCommandPool[operationNumber])
-        # request a new struct
-        struct.Loads(i)
-        # load datas
-        result.append(struct)
-        # submit single struct
-    # load datas from json dict
-    return result
-    # return
+    def Dumps(self) -> dict:
+        return {
+            'AuthorName': self.AuthorName,
+            'BDXContent': [i.Dumps() for i in self.BDXContent],
+            'Signature': self.Signature.Dumps()
+        }
