@@ -75,11 +75,12 @@ _[注：我们建议您在 `Python 3.10` 及以上的版本使用本项目，`3.
 
 
 # 第三方依赖
-本项目使用了 `brotli` 和 `nbtlib` 总计 `2` 个第三方库，您可以通过在 `终端` 逐一地执行以下命令以安装它们。
+本项目使用了 `brotli, nbtlib, pycryptodome` 总计 `3` 个第三方库，您可以通过在 `终端` 逐一地执行以下命令以安装它们。
 
 ```
 pip install brotli
 pip install nbtlib
+pip install pycryptodome
 ```
 
 
