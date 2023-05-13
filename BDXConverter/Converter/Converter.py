@@ -85,9 +85,10 @@ class BDX(GeneralClass):
                 # submit single datas
         # read datas from reader
         self.Signature.UnMarshal(reader)
-        reader.truncate(reader.seek(-1, 1))
-        self.Signature.BDXContentWithInsideHeader = reader
-        self.Signature.verifySignature()
+        if self.Signature.isLegacy == False:
+            reader.truncate(reader.seek(-1, 1))
+            self.Signature.BDXContentWithInsideHeader = reader
+            self.Signature.verifySignature()
         # signature
 
     def Loads(self, jsonDict: dict) -> None:
