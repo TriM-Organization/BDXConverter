@@ -78,8 +78,10 @@ class Signature(GeneralClass):
                 what you want. Same as follow
         `signer: str`
             Signer of this BDX file
+        `legacySignBuffer: bytes`
+            Binary signature datas on legacy signing method
         `signature: bytes`
-            Binary signature data
+            Binary signature datas
         `signedOrNeedToSign: bool` [You need to provide this while signing]
             If this file is signed, we will set it as True.
             Or, if you want to sign the changed BDX file,
@@ -94,8 +96,9 @@ class Signature(GeneralClass):
         `BDXContentWithInsideHeader: io.BytesIO` [You need to provide this while only used to signing]
             The content of BDX file with inside file header
         """
-        self.prove: str | None = None
+        self.prove: str = ''
         self.signer: str = ''
+        self.legacySignBuffer: bytes = b''
         self.signature: bytes = b''
 
         self.signedOrNeedToSign: bool = False
@@ -104,15 +107,15 @@ class Signature(GeneralClass):
         self.privateSigningKeyString: str = ''
         self.BDXContentWithInsideHeader: BytesIO = BytesIO(b'')
 
-    def verificationProve(self) -> str:
+    def verifyProve(self) -> str:
         """
-        Verify the validity of self.prove and return signer's name
+        Verify self.prove and return signer's name
         """
         constantServerKey = RSA.import_key('-----BEGIN RSA PUBLIC KEY-----\nMIIBCgKCAQEAzOoZfky1sYQXkTXWuYqf7HZ+tDSLyyuYOvyqt/dO4xahyNqvXcL5\n1A+eNFhsk6S5u84RuwsUk7oeNDpg/I0hbiRuJwCxFPJKNxDdj5Q5P5O0NTLR0TAT\nNBP7AjX6+XtNB/J6cV3fPcduqBbN4NjkNZxP4I1lgbupIR2lMKU9lXEn58nFSqSZ\nvG4BZfYLKUiu89IHaZOG5wgyDwwQrejxqkLUftmXibUO4s4gf8qAiLp3ukeIPYRj\nwGhGNlUfdU0foCxf2QwAoBV2xREL8/Sx1AIvmoVUg1SqCiIVMvbBkDoFfkzPZCgC\nLtmbkmqZJnpoBVHcBhBdUYsfyM6QwtWBNQIDAQAB\n-----END RSA PUBLIC KEY-----')
         verifier = PKCS1_v1_5.new(constantServerKey)
         # get publick key and verifier
         # note: this public key is provided from PhoenixBuilder code library
-        splitResult: list[str] = self.prove.split('::')  # type: ignore
+        splitResult: list[str] = self.prove.split('::')
         if len(splitResult) != 2:
             raise signatureError(
                 f'failed to parse prove datas; self.prove = "{self.prove}"')
@@ -133,7 +136,7 @@ class Signature(GeneralClass):
         if result == False:
             raise signatureError(
                 f'the prove provided has not been verified and may be invalid; self.prove = "{self.prove}"')
-        # verification the prove
+        # verify the prove
         return signer
         # return
 
@@ -150,36 +153,50 @@ class Signature(GeneralClass):
             raise signatureError(
                 f'the privateSigningKeyString provided is invalid; self.privateSigningKeyString = "{self.privateSigningKeyString}"')
 
+    def verifySignature(self) -> None:
+        splitResult: list[str] = self.prove.split('|')
+        if len(splitResult) != 2:
+            raise signatureError(
+                f'failed to parse prove datas; self.prove = "{self.prove}"')
+        # split prove into list
+        rsaPublicKey = RSA.import_key(splitResult[0])
+        # load rsa public key
+        verifier = PKCS1_v1_5.new(rsaPublicKey)
+        # get verifier
+        result = verifier.verify(
+            new(self.BDXContentWithInsideHeader.getvalue()),
+            self.signature
+        )
+        if result == False:
+            raise signatureError(
+                f'the signature provided has not been validated, and it may be invalid; self.signature.hex() = "{self.signature.hex()}"')
+        # verify the signature
+
     def Marshal(self, writer: BytesIO) -> None:
         if self.signedOrNeedToSign == False or self.isLegacy == True:
             return
         # check if need to sign this file or this is a legacy method
         # note: legacy method is officially deprecated so we cannot support this
-        if self.prove == None:
+        if self.prove == '':
             raise signatureError('self.prove is not assigned')
         # check the states of self.prove
         if not 'privateSigningKeyString' in self.__dict__:
             raise signatureError('self.privateSigningKeyString is not existed')
         # check the states of self.privateSigningKeyString
-        self.signer = self.verificationProve()
+        self.signer = self.verifyProve()
         # verification the prove
         newWriter: BytesIO = BytesIO(b'')
         newWriter.write(b'\x00\x8b')
-        newWriter.write(pack('<H', len(self.prove)))  # type: ignore
-        newWriter.write(self.prove.encode(encoding='utf-8'))  # type: ignore
-        newWriter.write(
-            PKCS1_v1_5.new(
-                self.loadPrivateKey()
-            ).sign(
-                new(
-                    self.BDXContentWithInsideHeader.getvalue()
-                )
-            )
-        )
-        self.signature = newWriter.getvalue()
+        newWriter.write(pack('<H', len(self.prove)))
+        newWriter.write(self.prove.encode(encoding='utf-8'))
+        signatureDatas = PKCS1_v1_5.new(self.loadPrivateKey()).sign(
+            new(self.BDXContentWithInsideHeader.getvalue()))
+        newWriter.write(signatureDatas)
+        self.signature = signatureDatas
+        self.verifySignature()
         # get sign content and sync datas
         writer.write(b'X')
-        writer.write(self.signature)
+        writer.write(newWriter.getvalue())
         # write Terminate and sign content
         if newWriter.seek(0, 1) >= 255:
             writer.write(pack('>H', newWriter.seek(0, 1)))
@@ -214,36 +231,46 @@ class Signature(GeneralClass):
             signLength: int = unpack('>B', getByte(buffer, 1))[0]
             buffer.seek(-2-signLength, 2)
         signContent = BytesIO(getByte(buffer, signLength))
-        # get sign content
+        # get sign content ans sync datas
         if getByte(signContent, 2) != b'\x00\x8b':
             self.isLegacy = True
-            self.prove = None
-            self.signature = signContent.getvalue()
+            self.legacySignBuffer = signContent.getvalue()
             return
         else:
             proveLength: int = unpack('<H', getByte(signContent, 2))[0]
             self.prove = getByte(
                 signContent, proveLength).decode(encoding='utf-8')
-            self.signer = self.verificationProve()
+            self.signer = self.verifyProve()
             self.signature = getByte(signContent, signLength-proveLength-4)
         # sync datas
         buffer.seek(nowSeek, 0)
         # revert the pointer
 
     def Loads(self, jsonDict: dict) -> None:
-        self.signer = jsonDict['Signer'] if 'Signer' in jsonDict else ''
         self.prove = jsonDict['Prove'] if 'Prove' in jsonDict else ''
+        self.prove = '' if self.prove == None else self.prove
+        if 'Signer' in jsonDict:
+            if jsonDict['Signer'] != None:
+                self.signer = jsonDict['Signer']
         if 'Signature' in jsonDict:
-            signBinaryContent: str = jsonDict['Signature']
-            self.signature = bytes.fromhex(signBinaryContent)
+            if jsonDict['Signature'] != None:
+                self.signature = bytes.fromhex(jsonDict['Signature'])
+        if 'LegacySignBuffer' in jsonDict:
+            if jsonDict['LegacySignBuffer'] != None:
+                self.legacySignBuffer = bytes.fromhex(
+                    jsonDict['LegacySignBuffer']
+                )
+        if 'Outdated' in jsonDict:
+            if jsonDict['Outdated'] != None:
+                self.isLegacy = jsonDict['Outdated']
         self.signedOrNeedToSign = jsonDict['Signed'] if 'Signed' in jsonDict else False
-        self.isLegacy = jsonDict['Outdated'] if 'Outdated' in jsonDict else False
 
     def Dumps(self) -> dict:
         return {
-            'Signer': self.signer,
-            'Prove': self.prove,
-            'Signature': self.signature.hex(),
+            'Signer': self.signer if self.signedOrNeedToSign == True else None,
+            'Prove': self.prove if self.prove != '' else None,
+            'Signature': self.signature.hex() if self.isLegacy == False and self.signedOrNeedToSign == True else None,
+            'LegacySignBuffer': self.legacySignBuffer.hex() if self.isLegacy == True and self.signedOrNeedToSign == True else None,
             'Signed': self.signedOrNeedToSign,
-            'Outdated': self.isLegacy
+            'Outdated': self.isLegacy if self.signedOrNeedToSign == True else None
         }
