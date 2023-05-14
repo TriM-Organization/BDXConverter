@@ -28,6 +28,8 @@
 - [目录](#目录)
 - [`BDX Converter`](#bdx-converter)
 - [注意事项](#注意事项)
+  - [兼容性](#兼容性)
+  - [签名](#签名)
 - [快速上手](#快速上手)
 - [🐍 Pypi Packages](#-pypi-packages)
 - [第三方依赖](#第三方依赖)
@@ -49,10 +51,71 @@
 
 
 # 注意事项
+## 兼容性
 - 版本 `1.1.0` 不兼容之前的所有版本
 - 版本 `1.0.16` 在可视化和反可视化字典方面不兼容之前的版本
-- BDX 文件标准是由 FastBuilder 定义的,签名功能要求必须具备FastBuilder账户
 
+## 签名
+- `BDX` 文件格式是由 `PhoenixBuilder` 所定义，签名 `BDX` 文件则必须具备 `PhoenixBuilder` 账户
+- 由于一些原因，您需要自行获取 `签名` 时的 `Prove` 和 `PrivateSigningKey` ，以下展示了获取方法。有关本项目实现的签名功能，请见 [`BDXConverter/Converter/Signature.py`](https://github.com/TriM-Organization/BDXConverter/blob/main/BDXConverter/Converter/Signature.py)
+
+  ```python
+  """
+  import ecdsa
+  
+  peer = ecdsa.SigningKey.generate(ecdsa.NIST384p)
+  verifyingKey = peer.get_verifying_key()
+  publicKey = verifyingKey.to_string().hex()
+  
+  print(publicKey)
+  # publicKey(...)
+  """
+  # Generate a new public key to send a auth request to the romote server
+  
+  
+  """
+  The address of PhoenixBuilder Auth server is wss://api.fastbuilder.pro:2053
+  """
+  # Address of PhoenixBuilder Auth server
+  
+  
+  """
+  Golang Structure
+  type AuthRequest struct {
+      Action         string `json:"action"`
+      ServerCode     string `json:"serverCode"`
+      ServerPassword string `json:"serverPassword"`
+      Key            string `json:"publicKey"`
+      FBToken        string
+  }
+
+  Python Dictionary
+  {
+      'action': 'phoenix::login',
+      'serverCode': ...,
+      'serverPassword': ...,
+      'publicKey': ...,
+      'FBToken': ...
+  }
+  """
+  # Send an auth request to the PhoenixBuilder Auth server
+  # Note: Must use GZIP to compress data when sending
+
+
+  """
+  Python Dictionary
+  {
+      'chainInfo': ...,
+      'code': ...,
+      'message': ...,
+      'privateSigningKey': ...,
+      'prove': ...
+  }
+  """
+  # The response of the PhoenixBuilder Auth server when the request succeeds
+  ```
+  - `PhoenixBuilder Auth Server` 使用了 `Cloudflared` 来代理(加速)它的 `Websocket` 服务器，因此您无法直接使用 `Python` 的 `Websocket` 库来连接此服务器。目前尚且未找到对应的解决办法，一个替代方案是使用 `Golang` 下的 `Websocket` 库与 `PhoenixBuilder Auth Server` 建立连接
+    - 其他帮助信息另见 https://github.com/huashengdun/webssh/issues/141
 
 
 

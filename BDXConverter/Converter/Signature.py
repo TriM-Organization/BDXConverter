@@ -209,9 +209,6 @@ class Signature(GeneralClass):
         # write the number of this pseudo-operation
 
     def UnMarshal(self, buffer: BytesIO) -> None:
-        """
-        Note: We don't check the signature data
-        """
         nowSeek = buffer.seek(0, 1)
         buffer.seek(-1, 2)
         if getByte(buffer, 1) != b'\x5a':
