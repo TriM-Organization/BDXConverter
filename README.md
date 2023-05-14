@@ -194,7 +194,7 @@ class GeneralClass:
 因此，通过 `Marshal` 和 `UnMarshal` 函数，`BDX Converter` 可以自由的将 `二进制数据` 转换为 `Python Class` ，亦或转换回去。 <br/>
 而 `Loads` 和 `Dumps` 分别支持了把只带有基本数据类型的字典转换为 `Python Class` 亦或转换回去的功能。 
 
-目前 `BDX Converter` 支持了所有的操作符(不含签名功能)，包括但不限于 `Operation 5, Operation 13, Operation 40` 和 `Operation 41` 。 
+目前 `BDX Converter` 支持了所有的操作符，包括但不限于 `Operation 5, Operation 13, Operation 40` 和 `Operation 41` ，当前也包含 `签名` 相关的功能。
 
 
 
