@@ -1,4 +1,5 @@
 .vscode
+.idea
 /dist
 /build
 /BDXConverter.egg-info
