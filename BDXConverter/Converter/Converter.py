@@ -85,7 +85,7 @@ class BDX(GeneralClass):
                 # submit single datas
         # read datas from reader
         self.Signature.UnMarshal(reader)
-        if self.Signature.isLegacy == False:
+        if self.Signature.isLegacy == False and self.Signature.signedOrNeedToSign == True:
             reader.truncate(reader.seek(-1, 1))
             self.Signature.BDXContentWithInsideHeader = reader
             self.Signature.verifySignature()
