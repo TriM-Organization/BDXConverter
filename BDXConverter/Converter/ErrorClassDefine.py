@@ -4,7 +4,7 @@ class headerError(Exception):
     """
 
     def __init__(self, header: bytes):
-        Exception.__init__(self, f'find invalid file header "{header}"')
+        Exception.__init__(self, f'find invalid file header {header}')
 
 
 class readError(Exception):

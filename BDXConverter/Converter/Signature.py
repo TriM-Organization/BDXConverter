@@ -3,6 +3,7 @@ from Crypto.Hash.SHA256 import new
 from Crypto.PublicKey import RSA
 from io import BytesIO
 from struct import pack, unpack
+from json import dumps
 from .ErrorClassDefine import signatureError
 from ..General.GeneralClass import GeneralClass
 from ..utils.getByte import getByte
@@ -118,7 +119,7 @@ class Signature(GeneralClass):
         splitResult: list[str] = self.prove.split('::')
         if len(splitResult) != 2:
             raise signatureError(
-                f'failed to parse prove datas; self.prove = "{self.prove}"')
+                f'failed to parse prove datas; self.prove = {dumps(self.prove,ensure_ascii=False)}')
         # split prove into list
         # example:
         # splitResult: list[str] = [rsaPublicKeyWithHolder: str, signature: str]
@@ -126,7 +127,7 @@ class Signature(GeneralClass):
         findResult = splitResult[0].find('-----END RSA PUBLIC KEY-----')
         if findResult == -1:
             raise signatureError(
-                f'the prove provided has not been verified and may be invalid; self.prove = "{self.prove}"')
+                f'the prove provided has not been verified and may be invalid; self.prove = {dumps(self.prove,ensure_ascii=False)}')
         signer = splitResult[0][findResult+30:]
         # get signer's name
         result = verifier.verify(
@@ -135,7 +136,7 @@ class Signature(GeneralClass):
         )
         if result == False:
             raise signatureError(
-                f'the prove provided has not been verified and may be invalid; self.prove = "{self.prove}"')
+                f'the prove provided has not been verified and may be invalid; self.prove = {dumps(self.prove,ensure_ascii=False)}')
         # verify the prove
         return signer
         # return
@@ -151,13 +152,13 @@ class Signature(GeneralClass):
             successStates = False
         if successStates == False:
             raise signatureError(
-                f'the privateSigningKeyString provided is invalid; self.privateSigningKeyString = "{self.privateSigningKeyString}"')
+                f'the privateSigningKeyString provided is invalid; self.privateSigningKeyString = {dumps(self.privateSigningKeyString,ensure_ascii=False)}')
 
     def verifySignature(self) -> None:
         splitResult: list[str] = self.prove.split('|')
         if len(splitResult) != 2:
             raise signatureError(
-                f'failed to parse prove datas; self.prove = "{self.prove}"')
+                f'failed to parse prove datas; self.prove = {dumps(self.prove,ensure_ascii=False)}')
         # split prove into list
         rsaPublicKey = RSA.import_key(splitResult[0])
         # load rsa public key
@@ -169,7 +170,7 @@ class Signature(GeneralClass):
         )
         if result == False:
             raise signatureError(
-                f'the signature provided has not been validated, and it may be invalid; self.signature.hex() = "{self.signature.hex()}"')
+                f'the signature provided has not been validated, and it may be invalid; self.signature.hex() = {dumps(self.signature.hex())}')
         # verify the signature
 
     def Marshal(self, writer: BytesIO) -> None:
