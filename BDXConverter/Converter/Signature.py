@@ -97,7 +97,7 @@ class Signature(GeneralClass):
         `fileHash: Crypto.Hash.SHA256.SHA256Hash` [You need to provide this while only used to signing]
             The hash value of the BDX file with inside header.
                 Note: Terminators like `XE` or `X` are not included.
-                Example: `BDX\x00Happy2018new\x00\x01command_block\x00`
+                Example: `BDX\\x00Happy2018new\\x00\\x01command_block\\x00`
         """
         self.prove: str = ''
         self.signer: str = ''
