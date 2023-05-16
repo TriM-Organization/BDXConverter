@@ -217,7 +217,7 @@ class Signature(GeneralClass):
             return
         else:
             self.signedOrNeedToSign = True
-        # check if need to sign this file
+        # check if this file is signed
         buffer.seek(-2, 2)
         if getByte(buffer, 1) == b'\xff':
             buffer.seek(-4, 2)
@@ -228,7 +228,7 @@ class Signature(GeneralClass):
             signLength: int = unpack('>B', getByte(buffer, 1))[0]
             buffer.seek(-2-signLength, 2)
         signContent = BytesIO(getByte(buffer, signLength))
-        # get sign content ans sync datas
+        # get sign content and sync datas
         if getByte(signContent, 2) != b'\x00\x8b':
             self.isLegacy = True
             self.legacySignBuffer = signContent.getvalue()
