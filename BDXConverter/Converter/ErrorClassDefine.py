@@ -1,13 +1,13 @@
-class headerError(Exception):
+class HeaderError(Exception):
     """
-    header error occurred while reading header in BDX file
+    Header error occurred while reading header in BDX file
     """
 
     def __init__(self, header: bytes):
         Exception.__init__(self, f'find invalid file header {header}')
 
 
-class readError(Exception):
+class ReadError(Exception):
     """
     BDX file read error
     """
@@ -17,7 +17,7 @@ class readError(Exception):
             self, f'failed to convert this BDX file, and the error occurred at position {errorOccurredPosition}')
 
 
-class unknownOperationError(Exception):
+class UnknownOperationError(Exception):
     """
     Find unknown operation error
     """
@@ -27,7 +27,7 @@ class unknownOperationError(Exception):
             self, f'an unknown operation {operationId} was found, and the error occurred at position {errorOccurredPosition}')
 
 
-class signatureError(Exception):
+class SignatureError(Exception):
     """
     Error occurred while signing
     """

@@ -1,12 +1,13 @@
+from brotli import compress, decompress
+from Crypto.Hash.SHA256 import new
+from io import BytesIO
+from copy import deepcopy
+from .Signature import Signature
+from .ErrorClassDefine import HeaderError
+from .ErrorClassDefine import ReadError, UnknownOperationError
 from ..General.GeneralClass import GeneralClass
 from ..General.Pool import GetBDXCommandPool
 from ..utils.getString import getByte, getString
-from .Signature import Signature
-from .ErrorClassDefine import headerError
-from .ErrorClassDefine import readError, unknownOperationError
-from brotli import compress, decompress
-from io import BytesIO
-from copy import deepcopy
 
 
 class BDX(GeneralClass):
@@ -34,8 +35,8 @@ class BDX(GeneralClass):
                 length=1, byteorder='big', signed=False))
             i.Marshal(newWriter)
         # valid contents
-        if self.Signature.signedOrNeedToSign == True and self.Signature.isLegacy == False:
-            self.Signature.BDXContentWithInsideHeader = newWriter
+        if self.Signature.isLegacy == False and self.Signature.signedOrNeedToSign == True:
+            self.Signature.fileHash = new(newWriter.getvalue())
             self.Signature.Marshal(newWriter)
         else:
             newWriter.write(b'XE')
@@ -45,17 +46,17 @@ class BDX(GeneralClass):
 
     def UnMarshal(self, binaryDatas: bytes) -> None:
         if binaryDatas[0:3] != b'BD@':
-            raise headerError(binaryDatas[:3])
+            raise HeaderError(binaryDatas[:3])
         # check outside header
         reader = BytesIO(decompress(binaryDatas[3:]))
         # get reader to read valid contents
         insideHeader = getByte(reader, 3)
         if insideHeader != b'BDX':
-            raise headerError(insideHeader)
+            raise HeaderError(insideHeader)
         # check inside header
         firstOperation = getByte(reader, 1)
         if firstOperation != b'\x00':
-            raise unknownOperationError(firstOperation[0], reader.seek(-1, 1))
+            raise UnknownOperationError(firstOperation[0], reader.seek(-1, 1))
         self.AuthorName = getString(reader)
         # get author's name
         BDXCommandPool: dict[int, GeneralClass] = GetBDXCommandPool()
@@ -79,7 +80,7 @@ class BDX(GeneralClass):
                 if errorType == 1:
                     raise EOFError
                 elif errorType == 2:
-                    raise readError(reader.seek(0, 1))
+                    raise ReadError(reader.seek(0, 1))
                 # if meet error
                 self.BDXContent.append(struct)
                 # submit single datas
@@ -87,7 +88,7 @@ class BDX(GeneralClass):
         self.Signature.UnMarshal(reader)
         if self.Signature.isLegacy == False and self.Signature.signedOrNeedToSign == True:
             reader.truncate(reader.seek(-1, 1))
-            self.Signature.BDXContentWithInsideHeader = reader
+            self.Signature.fileHash = new(reader.getvalue())
             self.Signature.verifySignature()
         # signature
 

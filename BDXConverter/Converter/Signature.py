@@ -1,10 +1,10 @@
 from Crypto.Signature import PKCS1_v1_5
-from Crypto.Hash.SHA256 import new
 from Crypto.PublicKey import RSA
+from Crypto.Hash.SHA256 import SHA256Hash, new
 from io import BytesIO
 from struct import pack, unpack
 from json import dumps
-from .ErrorClassDefine import signatureError
+from .ErrorClassDefine import SignatureError
 from ..General.GeneralClass import GeneralClass
 from ..utils.getByte import getByte
 
@@ -73,7 +73,7 @@ class Signature(GeneralClass):
         """
         `prove: str` [You need to provide this while signing]
             Prove provided by the PhoenixBuilder Auth server.
-                Note: You don't know what "Prove: str" is?
+                Note: You don't know what "prove: str" is?
                 If you go to the beginning of this file, 
                 there's a comment there, then you will get 
                 what you want. Same as follow
@@ -94,8 +94,10 @@ class Signature(GeneralClass):
         `privateSigningKeyString: str` [You need to provide this while signing]
             The private key which used to sign BDX file
             provided by the PhoenixBuilder Auth server
-        `BDXContentWithInsideHeader: io.BytesIO` [You need to provide this while only used to signing]
-            The content of BDX file with inside file header
+        `fileHash: Crypto.Hash.SHA256.SHA256Hash` [You need to provide this while only used to signing]
+            The hash value of the BDX file with inside header.
+                Note: Terminators like `XE` or `X` are not included.
+                Example: `BDX\x00Happy2018new\x00\x01command_block\x00`
         """
         self.prove: str = ''
         self.signer: str = ''
@@ -106,7 +108,7 @@ class Signature(GeneralClass):
         self.isLegacy: bool = False
 
         self.privateSigningKeyString: str = ''
-        self.BDXContentWithInsideHeader: BytesIO = BytesIO(b'')
+        self.fileHash: SHA256Hash = SHA256Hash()
 
     def verifyProve(self) -> str:
         """
@@ -118,7 +120,7 @@ class Signature(GeneralClass):
         # note: this public key is provided from PhoenixBuilder code library
         splitResult: list[str] = self.prove.split('::')
         if len(splitResult) != 2:
-            raise signatureError(
+            raise SignatureError(
                 f'failed to parse prove datas; self.prove = {dumps(self.prove,ensure_ascii=False)}')
         # split prove into list
         # example:
@@ -126,7 +128,7 @@ class Signature(GeneralClass):
         # note: rsaPublicKey is used to sign the BDX file
         findResult = splitResult[0].find('-----END RSA PUBLIC KEY-----')
         if findResult == -1:
-            raise signatureError(
+            raise SignatureError(
                 f'the prove provided has not been verified and may be invalid; self.prove = {dumps(self.prove,ensure_ascii=False)}')
         signer = splitResult[0][findResult+30:]
         # get signer's name
@@ -135,7 +137,7 @@ class Signature(GeneralClass):
             bytes.fromhex(splitResult[1])
         )
         if result == False:
-            raise signatureError(
+            raise SignatureError(
                 f'the prove provided has not been verified and may be invalid; self.prove = {dumps(self.prove,ensure_ascii=False)}')
         # verify the prove
         return signer
@@ -151,25 +153,22 @@ class Signature(GeneralClass):
         except:
             successStates = False
         if successStates == False:
-            raise signatureError(
+            raise SignatureError(
                 f'the privateSigningKeyString provided is invalid; self.privateSigningKeyString = {dumps(self.privateSigningKeyString,ensure_ascii=False)}')
 
     def verifySignature(self) -> None:
         splitResult: list[str] = self.prove.split('|')
         if len(splitResult) != 2:
-            raise signatureError(
+            raise SignatureError(
                 f'failed to parse prove datas; self.prove = {dumps(self.prove,ensure_ascii=False)}')
         # split prove into list
         rsaPublicKey = RSA.import_key(splitResult[0])
         # load rsa public key
         verifier = PKCS1_v1_5.new(rsaPublicKey)
         # get verifier
-        result = verifier.verify(
-            new(self.BDXContentWithInsideHeader.getvalue()),
-            self.signature
-        )
+        result = verifier.verify(self.fileHash, self.signature)
         if result == False:
-            raise signatureError(
+            raise SignatureError(
                 f'the signature provided has not been validated, and it may be invalid; self.signature.hex() = {dumps(self.signature.hex())}')
         # verify the signature
 
@@ -179,10 +178,10 @@ class Signature(GeneralClass):
         # check if need to sign this file or this is a legacy method
         # note: legacy method is officially deprecated so we cannot support this
         if self.prove == '':
-            raise signatureError('self.prove is not assigned')
+            raise SignatureError('self.prove is not assigned')
         # check the states of self.prove
         if not 'privateSigningKeyString' in self.__dict__:
-            raise signatureError('self.privateSigningKeyString is not existed')
+            raise SignatureError('self.privateSigningKeyString is not existed')
         # check the states of self.privateSigningKeyString
         self.signer = self.verifyProve()
         # verification the prove
@@ -190,8 +189,8 @@ class Signature(GeneralClass):
         newWriter.write(b'\x00\x8b')
         newWriter.write(pack('<H', len(self.prove)))
         newWriter.write(self.prove.encode(encoding='utf-8'))
-        signatureDatas = PKCS1_v1_5.new(self.loadPrivateKey()).sign(
-            new(self.BDXContentWithInsideHeader.getvalue()))
+        signatureDatas = PKCS1_v1_5.new(
+            self.loadPrivateKey()).sign(self.fileHash)
         newWriter.write(signatureDatas)
         self.signature = signatureDatas
         self.verifySignature()
