@@ -6,6 +6,7 @@ from ..utils.getString import getByte, getString
 
 class PlaceBlockWithBlockStatesDeprecated(GeneralClass):
     def __init__(self) -> None:
+        super().__init__()
         self.operationName: str = 'PlaceBlockWithBlockStatesDeprecated'
         self.operationNumber: int = 13
         self.blockConstantStringID: int = 0

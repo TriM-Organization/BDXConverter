@@ -10,6 +10,7 @@ class ChestSlot(GeneralClass):
     """
 
     def __init__(self) -> None:
+        super().__init__()
         self.itemName: str = ''
         self.count: int = 0
         self.data: int = 0

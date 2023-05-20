@@ -6,6 +6,7 @@ from ..utils.getByte import getByte
 
 class PlaceRuntimeBlock(GeneralClass):
     def __init__(self) -> None:
+        super().__init__()
         self.operationName: str = 'PlaceRuntimeBlock'
         self.operationNumber: int = 32
         self.runtimeId: int = 0

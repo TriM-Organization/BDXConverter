@@ -6,13 +6,13 @@ import nbtlib
 endian: str = '<'
 
 
-class getValueError(Exception):
+class GetValueError(Exception):
     def __init__(self, errorOccurredPosition: int):
         Exception.__init__(
             self, f'failed to parse value, and the error occurred at position {errorOccurredPosition}')
 
 
-class unexpectedError(Exception):
+class UnexpectedError(Exception):
     def __init__(self, value: int):
         Exception.__init__(self, f'unexpected number {value}')
 
@@ -44,7 +44,7 @@ def getValue(buffer: BytesIO, valueType: int) -> ...:
     elif valueType == 10:
         return getCompound(buffer)
     else:
-        raise getValueError(buffer.seek(0, 1))
+        raise GetValueError(buffer.seek(0, 1))
 
 
 def getArray(buffer: BytesIO, valueType: int) -> ...:
@@ -56,7 +56,7 @@ def getArray(buffer: BytesIO, valueType: int) -> ...:
     elif valueType == 12:
         return nbtlib.tag.LongArray([unpack(f'{endian}q', getByte(buffer, 8))[0] for _ in range(arrayLength)])
     else:
-        raise unexpectedError(valueType)
+        raise UnexpectedError(valueType)
 
 
 def getList(buffer: BytesIO) -> nbtlib.tag.List:

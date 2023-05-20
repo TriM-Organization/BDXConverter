@@ -16,39 +16,41 @@ class BDX(GeneralClass):
         `AuthorName: str`
             The author of this BDX file
                 Note: The default value is "TriM-Organization/BDXConverter"
-        `BDXContent: list[GeneralClass]`
+        `BDXContents: list[GeneralClass]`
             The valid contents of the BDX file
         `Signature: Signature`
             The signature data of the BDX file
         """
+        super().__init__()
         self.AuthorName: str = 'TriM-Organization/BDXConverter'
-        self.BDXContent: list[GeneralClass] = []
+        self.BDXContents: list[GeneralClass] = []
         self.Signature: Signature = Signature()
 
     def Marshal(self, writer: BytesIO) -> None:
         newWriter = BytesIO(
-            b'BDX\x00'+self.AuthorName.encode(encoding='utf-8')+b'\x00')
+            b'BDX\x00' + self.AuthorName.encode(encoding='utf-8') + b'\x00')
         newWriter.seek(0, 2)
         # inside header with author's name
-        for i in self.BDXContent:
-            newWriter.write(i.operationNumber.to_bytes(
-                length=1, byteorder='big', signed=False))
-            i.Marshal(newWriter)
+        for i in self.BDXContents:
+            if 'operationNumber' in i.__dict__:
+                newWriter.write(i.__dict__['operationNumber'].to_bytes(
+                    length=1, byteorder='big', signed=False))
+                i.Marshal(newWriter)
         # valid contents
-        if self.Signature.isLegacy == False and self.Signature.signedOrNeedToSign == True:
+        if not self.Signature.isLegacy and self.Signature.signedOrNeedToSign:
             self.Signature.fileHash = new(newWriter.getvalue())
             self.Signature.Marshal(newWriter)
         else:
             newWriter.write(b'XE')
         # signature
-        writer.write(b'BD@'+compress(newWriter.getvalue()))
-        # write BDX datas
+        writer.write(b'BD@' + compress(newWriter.getvalue()))
+        # write BDX data
 
-    def UnMarshal(self, binaryDatas: bytes) -> None:
-        if binaryDatas[0:3] != b'BD@':
-            raise HeaderError(binaryDatas[:3])
+    def UnMarshal(self, binaryData: bytes) -> None:
+        if binaryData[0:3] != b'BD@':
+            raise HeaderError(binaryData[:3])
         # check outside header
-        reader = BytesIO(decompress(binaryDatas[3:]))
+        reader = BytesIO(decompress(binaryData[3:]))
         # get reader to read valid contents
         insideHeader = getByte(reader, 3)
         if insideHeader != b'BDX':
@@ -82,11 +84,11 @@ class BDX(GeneralClass):
                 elif errorType == 2:
                     raise ReadError(reader.seek(0, 1))
                 # if meet error
-                self.BDXContent.append(struct)
-                # submit single datas
-        # read datas from reader
+                self.BDXContents.append(struct)
+                # submit single data
+        # read data from reader
         self.Signature.UnMarshal(reader)
-        if self.Signature.isLegacy == False and self.Signature.signedOrNeedToSign == True:
+        if not self.Signature.isLegacy and self.Signature.signedOrNeedToSign:
             reader.truncate(reader.seek(-1, 1))
             self.Signature.fileHash = new(reader.getvalue())
             self.Signature.verifySignature()
@@ -98,21 +100,21 @@ class BDX(GeneralClass):
         self.AuthorName = jsonDict['AuthorName'] if 'AuthorName' in jsonDict else ''
         if 'Signature' in jsonDict:
             self.Signature.Loads(jsonDict['Signature'])
-        if 'BDXContent' in jsonDict:
-            tmp: list[dict] = jsonDict['BDXContent']
+        if 'BDXContents' in jsonDict:
+            tmp: list[dict] = jsonDict['BDXContents']
             for i in tmp:
-                if not 'operationNumber' in i:
+                if not ('operationNumber' in i):
                     continue
-                if not 'operationDatas' in i:
+                if not ('operationData' in i):
                     continue
                 commandId: int = i['operationNumber']
                 struct: GeneralClass = deepcopy(BDXCommandPool[commandId])
-                struct.Loads(i['operationDatas'])
-                self.BDXContent.append(struct)
+                struct.Loads(i['operationData'])
+                self.BDXContents.append(struct)
 
     def Dumps(self) -> dict:
         return {
             'AuthorName': self.AuthorName,
-            'BDXContent': [i.Dumps() for i in self.BDXContent],
+            'BDXContents': [i.Dumps() for i in self.BDXContents],
             'Signature': self.Signature.Dumps()
         }

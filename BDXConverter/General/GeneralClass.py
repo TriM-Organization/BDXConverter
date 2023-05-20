@@ -25,15 +25,15 @@ class GeneralClass:
 
     def Loads(self, jsonDict: dict) -> None:
         """
-        Load datas from jsonDict:dict
+        Load data from jsonDict:dict
         """
         if 'operationNumber' in self.__dict__:
-            jsonDict['operationNumber'] = self.operationNumber
-            jsonDict['operationName'] = self.operationName
-        if 'operationDatas' in self.__dict__:
-            for i in self.__dict__['operationDatas']:
+            jsonDict['operationNumber'] = self.__dict__['operationNumber']
+            jsonDict['operationName'] = self.__dict__['operationName']
+        if 'operationData' in self.__dict__:
+            for i in self.__dict__['operationData']:
                 if i in jsonDict:
-                    self.__dict__['operationDatas'][i] = jsonDict[i]
+                    self.__dict__['operationData'][i] = jsonDict[i]
         else:
             for i in self.__dict__:
                 if i in jsonDict:
@@ -45,12 +45,11 @@ class GeneralClass:
         """
         if 'operationNumber' in self.__dict__:
             copyDict = deepcopy(self.__dict__)
-            del copyDict['operationNumber']
-            del copyDict['operationName']
+            del copyDict['operationNumber'], copyDict['operationName']
             return {
-                'operationNumber': self.operationNumber,
-                'operationName': self.operationName,
-                'operationDatas': copyDict
+                'operationNumber': self.__dict__['operationNumber'],
+                'operationName': self.__dict__['operationName'],
+                'operationData': copyDict
             }
         else:
             return self.__dict__

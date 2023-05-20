@@ -6,6 +6,7 @@ from ..utils.getString import getByte, getString
 
 class PlaceBlockWithCommandBlockData(GeneralClass):
     def __init__(self) -> None:
+        super().__init__()
         self.operationName: str = 'PlaceBlockWithCommandBlockData'
         self.operationNumber: int = 27
         self.blockConstantStringID: int = 0
@@ -14,14 +15,14 @@ class PlaceBlockWithCommandBlockData(GeneralClass):
         self.command: str = ''
         self.customName: str = ''
         self.lastOutput: str = ''
-        self.tickdelay: int = 0
+        self.tickDelay: int = 0
         self.executeOnFirstTick: bool = True
         self.trackOutput: bool = True
         self.conditional: bool = False
         self.needsRedstone: bool = False
 
     def Marshal(self, writer: BytesIO) -> None:
-        writer.write(pack('>H', self.blockConstantStringID) + pack('>H', self.blockData) + pack('>I', self.mode) + self.command.encode(encoding='utf-8') + b'\x00' + self.customName.encode(encoding='utf-8') + b'\x00' + self.lastOutput.encode(encoding='utf-8') + b'\x00' + pack('>I', self.tickdelay) +
+        writer.write(pack('>H', self.blockConstantStringID) + pack('>H', self.blockData) + pack('>I', self.mode) + self.command.encode(encoding='utf-8') + b'\x00' + self.customName.encode(encoding='utf-8') + b'\x00' + self.lastOutput.encode(encoding='utf-8') + b'\x00' + pack('>I', self.tickDelay) +
                      self.executeOnFirstTick.to_bytes(length=1, byteorder='big', signed=False) + self.trackOutput.to_bytes(length=1, byteorder='big', signed=False) + self.conditional.to_bytes(length=1, byteorder='big', signed=False) + self.needsRedstone.to_bytes(length=1, byteorder='big', signed=False))
 
     def UnMarshal(self, buffer: BytesIO) -> None:
@@ -31,7 +32,7 @@ class PlaceBlockWithCommandBlockData(GeneralClass):
         self.command = getString(buffer)
         self.customName = getString(buffer)
         self.lastOutput = getString(buffer)
-        self.tickdelay = unpack('>I', getByte(buffer, 4))[0]
+        self.tickDelay = unpack('>I', getByte(buffer, 4))[0]
         self.executeOnFirstTick = bool(getByte(buffer, 1)[0])
         self.trackOutput = bool(getByte(buffer, 1)[0])
         self.conditional = bool(getByte(buffer, 1)[0])

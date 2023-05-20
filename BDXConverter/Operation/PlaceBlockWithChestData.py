@@ -7,6 +7,7 @@ from ..utils.getByte import getByte
 
 class PlaceBlockWithChestData(GeneralClass):
     def __init__(self) -> None:
+        super().__init__()
         self.operationName: str = 'PlaceBlockWithChestData'
         self.operationNumber: int = 40
         self.blockConstantStringID: int = 0
@@ -28,8 +29,8 @@ class PlaceBlockWithChestData(GeneralClass):
         self.data.UnMarshal(buffer)
 
     def Loads(self, jsonDict: dict) -> None:
-        if 'operationDatas' in jsonDict:
-            jsonDict = jsonDict['operationDatas']
+        if 'operationData' in jsonDict:
+            jsonDict = jsonDict['operationData']
             self.blockConstantStringID = jsonDict['blockConstantStringID'] if 'blockConstantStringID' in jsonDict else 0
             self.blockData = jsonDict['blockData'] if 'blockData' in jsonDict else 0
             newChestData = ChestData()
@@ -42,7 +43,7 @@ class PlaceBlockWithChestData(GeneralClass):
         return {
             'operationName': self.operationName,
             'operationNumber': self.operationNumber,
-            'operationDatas': {
+            'operationData': {
                 'blockConstantStringID': self.blockConstantStringID,
                 'blockData': self.blockData,
                 'slotCount': len(self.data.chestData),

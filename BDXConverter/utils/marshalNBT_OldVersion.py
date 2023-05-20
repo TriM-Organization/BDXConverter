@@ -62,7 +62,7 @@ def marshalToValue(writer: BytesIO, value, valueType: int) -> None:
         marshalToCompound(writer, value)
 
 
-def marshalToArray(writer: BytesIO,value,valueType: int) -> None:
+def marshalToArray(writer: BytesIO, value, valueType: int) -> None:
     writer.write(pack(f'{endian}i', len(value)))
     if valueType == 7:
         writer.write(b''.join([pack(f'{endian}b', i) for i in value]))

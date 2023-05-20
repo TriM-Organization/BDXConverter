@@ -5,6 +5,7 @@ from ..utils.getString import getString
 
 class CreateConstantString(GeneralClass):
     def __init__(self) -> None:
+        super().__init__()
         self.operationName: str = 'CreateConstantString'
         self.operationNumber: int = 1
         self.constantString: str = ''

@@ -6,6 +6,7 @@ from ..utils.getByte import getByte
 
 class AddInt32XValue(GeneralClass):
     def __init__(self) -> None:
+        super().__init__()
         self.operationName: str = 'AddInt32XValue'
         self.operationNumber: int = 21
         self.value: int = 0

@@ -19,7 +19,7 @@ publicKey = verifyingKey.to_string().hex()
 print(publicKey)
 # publicKey(...)
 """
-# Generate a new public key to send a auth request to the romote server
+# Generate a new public key to send an auth request to the PhoenixBuilder Auth server
 
 
 """
@@ -76,13 +76,13 @@ class Signature(GeneralClass):
                 Note: You don't know what "prove: str" is?
                 If you go to the beginning of this file, 
                 there's a comment there, then you will get 
-                what you want. Same as follow
+                what you want. Same as following
         `signer: str`
             Signer of this BDX file
         `legacySignBuffer: bytes`
-            Binary signature datas on legacy signing method
+            Binary signature data on legacy signing method
         `signature: bytes`
-            Binary signature datas
+            Binary signature data
         `signedOrNeedToSign: bool` [You need to provide this while signing]
             If this file is signed, we will set it as True.
             Or, if you want to sign the changed BDX file,
@@ -99,6 +99,8 @@ class Signature(GeneralClass):
                 Note: Terminators like `XE` or `X` are not included.
                 Example: `BDX\\x00Happy2018new\\x00\\x01command_block\\x00`
         """
+        super().__init__()
+
         self.prove: str = ''
         self.signer: str = ''
         self.legacySignBuffer: bytes = b''
@@ -121,7 +123,7 @@ class Signature(GeneralClass):
         splitResult: list[str] = self.prove.split('::')
         if len(splitResult) != 2:
             raise SignatureError(
-                f'failed to parse prove datas; self.prove = {dumps(self.prove,ensure_ascii=False)}')
+                f'failed to parse prove data; self.prove = {dumps(self.prove,ensure_ascii=False)}')
         # split prove into list
         # example:
         # splitResult: list[str] = [rsaPublicKeyWithHolder: str, signature: str]
@@ -129,72 +131,78 @@ class Signature(GeneralClass):
         findResult = splitResult[0].find('-----END RSA PUBLIC KEY-----')
         if findResult == -1:
             raise SignatureError(
-                f'the prove provided has not been verified and may be invalid; self.prove = {dumps(self.prove,ensure_ascii=False)}')
+                f'failed to authenticate self.prove; self.prove = {dumps(self.prove,ensure_ascii=False)}')
         signer = splitResult[0][findResult+30:]
         # get signer's name
         result = verifier.verify(
             new(splitResult[0].encode()),
             bytes.fromhex(splitResult[1])
         )
-        if result == False:
+        if not result:
             raise SignatureError(
-                f'the prove provided has not been verified and may be invalid; self.prove = {dumps(self.prove,ensure_ascii=False)}')
-        # verify the prove
+                f'failed to authenticate self.prove; self.prove = {dumps(self.prove,ensure_ascii=False)}')
+        # verify self.prove
         return signer
         # return
 
     def loadPrivateKey(self) -> RSA.RsaKey:
         """
-        Load privateKeyString:str into RSA.RsaKey and return it
+        Return `Crypto.PublicKey.RSA.RsaKey` from `privateKeyString: str`
         """
-        successStates: bool = True
+        successStates: bool = False
+        # init values
         try:
-            return RSA.import_key(self.privateSigningKeyString)
+            result = RSA.import_key(self.privateSigningKeyString)
+            successStates = True
         except:
-            successStates = False
-        if successStates == False:
+            pass
+        # load private key
+        if successStates:
+            return result  # type: ignore
+        else:
             raise SignatureError(
-                f'the privateSigningKeyString provided is invalid; self.privateSigningKeyString = {dumps(self.privateSigningKeyString,ensure_ascii=False)}')
+                f'self.privateSigningKeyString is invalid; self.privateSigningKeyString = {dumps(self.privateSigningKeyString,ensure_ascii=False)}')
+        # return
 
     def verifySignature(self) -> None:
         splitResult: list[str] = self.prove.split('|')
         if len(splitResult) != 2:
             raise SignatureError(
-                f'failed to parse prove datas; self.prove = {dumps(self.prove,ensure_ascii=False)}')
+                f'failed to parse prove data; self.prove = {dumps(self.prove,ensure_ascii=False)}')
         # split prove into list
         rsaPublicKey = RSA.import_key(splitResult[0])
         # load rsa public key
         verifier = PKCS1_v1_5.new(rsaPublicKey)
         # get verifier
         result = verifier.verify(self.fileHash, self.signature)
-        if result == False:
+        if not result:
             raise SignatureError(
-                f'the signature provided has not been validated, and it may be invalid; self.signature.hex() = {dumps(self.signature.hex())}')
+                f'failed to authenticate self.signature; self.signature.hex() = {dumps(self.signature.hex())}')
         # verify the signature
 
     def Marshal(self, writer: BytesIO) -> None:
-        if self.signedOrNeedToSign == False or self.isLegacy == True:
+        if not self.signedOrNeedToSign or self.isLegacy:
             return
-        # check if need to sign this file or this is a legacy method
-        # note: legacy method is officially deprecated so we cannot support this
+        # check if we need to sign this file or this is a legacy method
+        # note: legacy method is officially deprecated, so we cannot support this
         if self.prove == '':
             raise SignatureError('self.prove is not assigned')
         # check the states of self.prove
-        if not 'privateSigningKeyString' in self.__dict__:
+        if not ('privateSigningKeyString' in self.__dict__):
             raise SignatureError('self.privateSigningKeyString is not existed')
         # check the states of self.privateSigningKeyString
         self.signer = self.verifyProve()
-        # verification the prove
+        # verify self.prove
         newWriter: BytesIO = BytesIO(b'')
         newWriter.write(b'\x00\x8b')
         newWriter.write(pack('<H', len(self.prove)))
         newWriter.write(self.prove.encode(encoding='utf-8'))
-        signatureDatas = PKCS1_v1_5.new(
+        signatureData = PKCS1_v1_5.new(
             self.loadPrivateKey()).sign(self.fileHash)
-        newWriter.write(signatureDatas)
-        self.signature = signatureDatas
+        newWriter.write(signatureData)
+        self.signature = signatureData
         self.verifySignature()
-        # get sign content and sync datas
+        # get sign content and sync data
         writer.write(b'X')
         writer.write(newWriter.getvalue())
         # write Terminate and sign content
@@ -209,6 +217,9 @@ class Signature(GeneralClass):
         # write the number of this pseudo-operation
 
     def UnMarshal(self, buffer: BytesIO) -> None:
+        """
+        We don't do too many checks
+        """
         nowSeek = buffer.seek(0, 1)
         buffer.seek(-1, 2)
         if getByte(buffer, 1) != b'\x5a':
@@ -228,7 +239,7 @@ class Signature(GeneralClass):
             signLength: int = unpack('>B', getByte(buffer, 1))[0]
             buffer.seek(-2-signLength, 2)
         signContent = BytesIO(getByte(buffer, signLength))
-        # get sign content and sync datas
+        # get sign content and sync data
         if getByte(signContent, 2) != b'\x00\x8b':
             self.isLegacy = True
             self.legacySignBuffer = signContent.getvalue()
@@ -239,35 +250,35 @@ class Signature(GeneralClass):
                 signContent, proveLength).decode(encoding='utf-8')
             self.signer = self.verifyProve()
             self.signature = getByte(signContent, signLength-proveLength-4)
-        # sync datas
+        # sync data
         buffer.seek(nowSeek, 0)
         # revert the pointer
 
     def Loads(self, jsonDict: dict) -> None:
         self.prove = jsonDict['Prove'] if 'Prove' in jsonDict else ''
-        self.prove = '' if self.prove == None else self.prove
+        self.prove = '' if self.prove is None else self.prove
         if 'Signer' in jsonDict:
-            if jsonDict['Signer'] != None:
+            if jsonDict['Signer'] is not None:
                 self.signer = jsonDict['Signer']
         if 'Signature' in jsonDict:
-            if jsonDict['Signature'] != None:
+            if jsonDict['Signature'] is not None:
                 self.signature = bytes.fromhex(jsonDict['Signature'])
         if 'LegacySignBuffer' in jsonDict:
-            if jsonDict['LegacySignBuffer'] != None:
+            if jsonDict['LegacySignBuffer'] is not None:
                 self.legacySignBuffer = bytes.fromhex(
                     jsonDict['LegacySignBuffer']
                 )
         if 'Outdated' in jsonDict:
-            if jsonDict['Outdated'] != None:
+            if jsonDict['Outdated'] is not None:
                 self.isLegacy = jsonDict['Outdated']
         self.signedOrNeedToSign = jsonDict['Signed'] if 'Signed' in jsonDict else False
 
     def Dumps(self) -> dict:
         return {
-            'Signer': self.signer if self.isLegacy == False and self.signedOrNeedToSign == True else None,
+            'Signer': self.signer if not self.isLegacy and self.signedOrNeedToSign else None,
             'Prove': self.prove if self.prove != '' else None,
-            'Signature': self.signature.hex() if self.isLegacy == False and self.signedOrNeedToSign == True else None,
-            'LegacySignBuffer': self.legacySignBuffer.hex() if self.isLegacy == True and self.signedOrNeedToSign == True else None,
+            'Signature': self.signature.hex() if not self.isLegacy and self.signedOrNeedToSign else None,
+            'LegacySignBuffer': self.legacySignBuffer.hex() if self.isLegacy and self.signedOrNeedToSign else None,
             'Signed': self.signedOrNeedToSign,
-            'Outdated': self.isLegacy if self.signedOrNeedToSign == True else None
+            'Outdated': self.isLegacy if self.signedOrNeedToSign else None
         }

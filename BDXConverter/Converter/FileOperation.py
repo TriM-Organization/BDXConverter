@@ -44,20 +44,20 @@ def VisualStructs(BDXObj: BDX, outputPath: str) -> None:
                 separators=(', ', ': '),
                 ensure_ascii=False
             ))
-    # write json datas
+    # write json data
 
 
 def ConvertJSONFileIntoStructs(path: str) -> BDX:
     """
-    Read json datas from path:str and convert it into class BDX
+    Read json data from path:str and convert it into class BDX
     """
     with open(path, 'r+', encoding='utf-8') as file:
         fileContext: str = file.read()
-    jsonDatas: dict = loads(fileContext)
-    # load json datas from file
+    jsonData: dict = loads(fileContext)
+    # load json data from file
     result = BDX()
     # request a new class object
-    result.Loads(jsonDatas)
+    result.Loads(jsonData)
     # loads
     return result
     # return

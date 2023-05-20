@@ -52,6 +52,7 @@
 
 # 注意事项
 ## 兼容性
+- 版本 `1.1.14` 不兼容之前的所有版本
 - 版本 `1.1.11` 在签名功能上不兼容之前的版本
 - 版本 `1.1.0` 不兼容之前的所有版本
 - 版本 `1.0.16` 在可视化和反可视化字典方面不兼容之前的版本
@@ -73,7 +74,7 @@
   print(publicKey)
   # publicKey(...)
   """
-  # Generate a new public key to send a auth request to the romote server
+  # Generate a new public key to send an auth request to the PhoenixBuilder Auth server
   
   
   """
@@ -186,7 +187,7 @@ class GeneralClass:
 
     def Loads(self, jsonDict: dict) -> None:
         """
-        Load datas from jsonDict:dict
+        Load data from jsonDict:dict
         """
         ...
 

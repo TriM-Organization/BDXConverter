@@ -6,6 +6,7 @@ from ..utils.getByte import getByte
 
 class PlaceBlockWithBlockStates(GeneralClass):
     def __init__(self) -> None:
+        super().__init__()
         self.operationName: str = 'PlaceBlockWithBlockStates'
         self.operationNumber: int = 5
         self.blockConstantStringID: int = 0

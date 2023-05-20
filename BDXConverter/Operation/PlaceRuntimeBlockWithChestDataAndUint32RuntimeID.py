@@ -7,6 +7,7 @@ from ..utils.getByte import getByte
 
 class PlaceRuntimeBlockWithChestDataAndUint32RuntimeID(GeneralClass):
     def __init__(self) -> None:
+        super().__init__()
         self.operationName: str = 'PlaceRuntimeBlockWithChestDataAndUint32RuntimeID'
         self.operationNumber: int = 38
         self.runtimeId: int = 0
@@ -26,8 +27,8 @@ class PlaceRuntimeBlockWithChestDataAndUint32RuntimeID(GeneralClass):
         self.data.UnMarshal(buffer)
 
     def Loads(self, jsonDict: dict) -> None:
-        if 'operationDatas' in jsonDict:
-            jsonDict = jsonDict['operationDatas']
+        if 'operationData' in jsonDict:
+            jsonDict = jsonDict['operationData']
             self.runtimeId = jsonDict['runtimeId'] if 'runtimeId' in jsonDict else 0
             newChestData = ChestData()
             if 'data' in jsonDict:
@@ -39,7 +40,7 @@ class PlaceRuntimeBlockWithChestDataAndUint32RuntimeID(GeneralClass):
         return {
             'operationName': self.operationName,
             'operationNumber': self.operationNumber,
-            'operationDatas': {
+            'operationData': {
                 'runtimeId': self.runtimeId,
                 'slotCount': len(self.data.chestData),
                 'data': self.data.Dumps()

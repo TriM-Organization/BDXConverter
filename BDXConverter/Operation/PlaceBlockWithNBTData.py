@@ -16,6 +16,7 @@ else:
 
 class PlaceBlockWithNBTData(GeneralClass):
     def __init__(self) -> None:
+        super().__init__()
         self.operationName: str = 'PlaceBlockWithNBTData'
         self.operationNumber: int = 41
         self.blockConstantStringID: int = 0
@@ -36,8 +37,8 @@ class PlaceBlockWithNBTData(GeneralClass):
             buffer)
 
     def Loads(self, jsonDict: dict) -> None:
-        if 'operationDatas' in jsonDict:
-            jsonDict = jsonDict['operationDatas']
+        if 'operationData' in jsonDict:
+            jsonDict = jsonDict['operationData']
             self.blockConstantStringID = jsonDict['blockConstantStringID'] if 'blockConstantStringID' in jsonDict else 0
             self.blockStatesConstantStringID = jsonDict[
                 'blockStatesConstantStringID'] if 'blockStatesConstantStringID' in jsonDict else 0
@@ -48,7 +49,7 @@ class PlaceBlockWithNBTData(GeneralClass):
         return {
             'operationName': self.operationName,
             'operationNumber': self.operationNumber,
-            'operationDatas': {
+            'operationData': {
                 'blockConstantStringID': self.blockConstantStringID,
                 'blockStatesConstantStringID': self.blockStatesConstantStringID,
                 'blockNBT': nbtlib.serialize_tag(self.blockNBT)

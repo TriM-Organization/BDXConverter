@@ -6,6 +6,7 @@ from ..utils.getByte import getByte
 
 class AddInt16ZValue0(GeneralClass):
     def __init__(self) -> None:
+        super().__init__()
         self.operationName: str = 'AddInt16ZValue0'
         self.operationNumber: int = 6
         self.value: int = 0

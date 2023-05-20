@@ -6,6 +6,7 @@ from ..utils.getByte import getByte
 
 class AssignDebugData(GeneralClass):
     def __init__(self) -> None:
+        super().__init__()
         self.operationName: str = 'AssignDebugData'
         self.operationNumber: int = 39
         self.length: int = 0
@@ -19,8 +20,8 @@ class AssignDebugData(GeneralClass):
         self.buffer = getByte(buffer, self.length)
 
     def Loads(self, jsonDict: dict) -> None:
-        if 'operationDatas' in jsonDict:
-            jsonDict = jsonDict['operationDatas']
+        if 'operationData' in jsonDict:
+            jsonDict = jsonDict['operationData']
             self.length = jsonDict['length'] if 'length' in jsonDict else 0
             self.buffer = b''.join(
                 [
@@ -33,7 +34,7 @@ class AssignDebugData(GeneralClass):
         return {
             'operationName': self.operationName,
             'operationNumber': self.operationNumber,
-            'operationDatas': {
+            'operationData': {
                 'length': self.length,
                 'buffer': [i for i in self.buffer]
             }

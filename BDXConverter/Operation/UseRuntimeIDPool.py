@@ -5,6 +5,7 @@ from ..utils.getByte import getByte
 
 class UseRuntimeIDPool(GeneralClass):
     def __init__(self) -> None:
+        super().__init__()
         self.operationName: str = 'UseRuntimeIDPool'
         self.operationNumber: int = 31
         self.poolId: int = 0
