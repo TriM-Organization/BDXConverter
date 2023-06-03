@@ -43,7 +43,8 @@ def VisualStructs(BDXObj: BDX, outputPath: str) -> None:
                 indent=4,
                 separators=(', ', ': '),
                 ensure_ascii=False
-            ))
+            )
+        )
     # write json data
 
 
