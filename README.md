@@ -61,65 +61,76 @@
 
 ## 签名
 - `BDX` 文件格式是由 `PhoenixBuilder` 所定义，签名 `BDX` 文件则必须具备 `PhoenixBuilder` 账户
-- 由于一些原因，您需要自行获取 `签名` 时的 `Prove` 和 `PrivateSigningKey` ，以下展示了获取方法。有关本项目实现的签名功能，请见 [`BDXConverter/Converter/Signature.py`](https://github.com/TriM-Organization/BDXConverter/blob/main/BDXConverter/Converter/Signature.py)
+- `签名` 时需要用到 `Prove` 和 `PrivateSigningKey` ，它们由 `PhoenixBuilder Auth Server` 提供。本库不计划支持自动获取这些字段，因此请通过以下展示的方法手动获取。有关本项目实现的签名功能，请见 [`BDXConverter/Converter/Signature.py`](https://github.com/TriM-Organization/BDXConverter/blob/main/BDXConverter/Converter/Signature.py)
 
   ```python
-  """
   import ecdsa
+  import requests
+  import json
+  
+  
+  api_url = 'https://api.fastbuilder.pro/api/phoenix/login'
+  # Address of PhoenixBuilder Auth Server(Login API URL)
+  
   
   peer = ecdsa.SigningKey.generate(ecdsa.NIST384p)
   verifyingKey = peer.get_verifying_key()
-  publicKey = verifyingKey.to_string().hex()
-  
-  print(publicKey)
-  # publicKey(...)
-  """
-  # Generate a new public key to send an auth request to the PhoenixBuilder Auth server
-  
-  
-  """
-  The address of PhoenixBuilder Auth server is wss://api.fastbuilder.pro:2053
-  """
-  # Address of PhoenixBuilder Auth server
+  client_public_key = verifyingKey.to_string().hex()  # type: ignore
+  # Generate a new client public key.
+  # This key is used to send a reuqest to PhoenixBuilder Auth Server,
+  # which is related to create connection with Netease Rental Server.
+  # But for us, it is not very necessary.
+  # However, we need do that or our request will be refused.
   
   
-  """
-  Golang Structure
-  type AuthRequest struct {
-      Action         string `json:"action"`
-      ServerCode     string `json:"serverCode"`
-      ServerPassword string `json:"serverPassword"`
-      Key            string `json:"publicKey"`
-      FBToken        string
+  login_request = {
+      'server_code': ...,  # data type is string
+      'server_passcode': ...,  # data type is string
+      'client_public_key': client_public_key,
+      'login_token': ...  # data type is string
   }
-
-  Python Dictionary
-  {
-      'action': 'phoenix::login',
-      'serverCode': ...,
-      'serverPassword': ...,
-      'publicKey': ...,
-      'FBToken': ...
+  # This dictionary contained your server code,
+  # your server password, and the key you recently generated,
+  # and your FB Token.
+  # We use this dictionary to send a request to PhoenixBuilder Auth Server,
+  # which allowed us to login to the Netease Rental Server.
+  # But for us, it is not very necessary.
+  # However, this maybe is the only way we could get the thing which signing used.
+  
+  
+  header = {
+      "Content-Type": "application/json",
+      "Authorization": f'Bearer {requests.get("https://api.fastbuilder.pro/api/new").text}'
   }
-  """
-  # Send an auth request to the PhoenixBuilder Auth server
-  # Note: Must use GZIP to compress data when sending
+  result = requests.post(
+      url=api_url, headers=header, data=json.dumps(login_request),
+  )
+  # Send login reuqest to PhoenixBuilder Auth Server and receive the response.
 
 
-  """
-  Python Dictionary
-  {
-      'chainInfo': ...,
-      'code': ...,
-      'message': ...,
-      'privateSigningKey': ...,
-      'prove': ...
-  }
-  """
-  # The response of the PhoenixBuilder Auth server when the request succeeds
+  result_dict = json.loads(result.text)
+  # The response from PhoenixBuilder Auth Server is a JSON string,
+  # which including the following data.
+  # {
+  #     'chainInfo': ...,
+  #     'ip_address': ...,
+  #     'message': 'well done',
+  #     'privateSigningKey': ...,
+  #     'prove': ...,
+  #     'respond_to': ...,
+  #     'success': True,
+  #     'uid': ...,
+  #     'username': ...
+  # }
+  
+  
+  print('privateSigningKey is:')
+  print(json.dumps(result_dict['privateSigningKey']))
+  print('\nprove is:')
+  print(json.dumps(result_dict['prove']))
+  # "privateSigningKey" and "prove" are used for signature related purposes.
+  # All we did was to get these two data points.
   ```
-  - `PhoenixBuilder Auth Server` 使用了 `Cloudflared` 来代理(加速)它的 `Websocket` 服务器，因此您无法直接使用 `Python` 的 `Websocket` 库来连接此服务器。目前尚且未找到对应的解决办法，一个替代方案是使用 `Golang` 下的 `Websocket` 库与 `PhoenixBuilder Auth Server` 建立连接
-    - 其他帮助信息另见 https://github.com/huashengdun/webssh/issues/141
 
 
 

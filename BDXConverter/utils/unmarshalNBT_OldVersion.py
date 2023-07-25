@@ -19,7 +19,7 @@ class UnexpectedError(Exception):
 
 def getName(buffer: BytesIO) -> str:
     keyLength = unpack(f'{endian}H', getByte(buffer, 2))[0]
-    return getByte(buffer, keyLength).decode(encoding='utf-8')
+    return getByte(buffer, keyLength).decode(encoding='utf-8', errors='replace')
 
 
 def getValue(buffer: BytesIO, valueType: int) -> ...:

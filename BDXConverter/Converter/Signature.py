@@ -11,57 +11,72 @@ from ..utils.getByte import getByte
 
 """
 import ecdsa
+import requests
+import json
+
+
+api_url = 'https://api.fastbuilder.pro/api/phoenix/login'
+# Address of PhoenixBuilder Auth Server(Login API URL)
+
 
 peer = ecdsa.SigningKey.generate(ecdsa.NIST384p)
 verifyingKey = peer.get_verifying_key()
-publicKey = verifyingKey.to_string().hex()
-
-print(publicKey)
-# publicKey(...)
-"""
-# Generate a new public key to send an auth request to the PhoenixBuilder Auth server
-
-
-"""
-The address of PhoenixBuilder Auth server is wss://api.fastbuilder.pro:2053
-"""
-# Address of PhoenixBuilder Auth server
+client_public_key = verifyingKey.to_string().hex()  # type: ignore
+# Generate a new client public key.
+# This key is used to send a reuqest to PhoenixBuilder Auth Server,
+# which is related to create connection with Netease Rental Server.
+# But for us, it is not very necessary.
+# However, we need do that or our request will be refused.
 
 
-"""
-Golang Structure
-type AuthRequest struct {
-    Action         string `json:"action"`
-    ServerCode     string `json:"serverCode"`
-    ServerPassword string `json:"serverPassword"`
-    Key            string `json:"publicKey"`
-    FBToken        string
+login_request = {
+    'server_code': ...,  # data type is string
+    'server_passcode': ...,  # data type is string
+    'client_public_key': client_public_key,
+    'login_token': ...  # data type is string
 }
+# This dictionary contained your server code,
+# your server password, and the key you recently generated,
+# and your FB Token.
+# We use this dictionary to send a request to PhoenixBuilder Auth Server,
+# which allowed us to login to the Netease Rental Server.
+# But for us, it is not very necessary.
+# However, this maybe is the only way we could get the thing which signing used.
 
-Python Dictionary
-{
-    'action': 'phoenix::login',
-    'serverCode': ...,
-    'serverPassword': ...,
-    'publicKey': ...,
-    'FBToken': ...
+
+header = {
+    "Content-Type": "application/json",
+    "Authorization": f'Bearer {requests.get("https://api.fastbuilder.pro/api/new").text}'
 }
-"""
-# Send an auth request to the PhoenixBuilder Auth server
-# Note: Must use GZIP to compress data when sending
+result = requests.post(
+    url=api_url, headers=header, data=json.dumps(login_request),
+)
+# Send login reuqest to PhoenixBuilder Auth Server and receive the response.
 
 
+result_dict = json.loads(result.text)
+# The response from PhoenixBuilder Auth Server is a JSON string,
+# which including the following data.
+# {
+#     'chainInfo': ...,
+#     'ip_address': ...,
+#     'message': 'well done',
+#     'privateSigningKey': ...,
+#     'prove': ...,
+#     'respond_to': ...,
+#     'success': True,
+#     'uid': ...,
+#     'username': ...
+# }
+
+
+print('privateSigningKey is:')
+print(json.dumps(result_dict['privateSigningKey']))
+print('\nprove is:')
+print(json.dumps(result_dict['prove']))
+# "privateSigningKey" and "prove" are used for signature related purposes.
+# All we did was to get these two data points.
 """
-Python Dictionary
-{
-    'chainInfo': ...,
-    'code': ...,
-    'message': ...,
-    'privateSigningKey': ...,
-    'prove': ...
-}
-"""
-# The response of the PhoenixBuilder Auth server when the request succeeds
 
 
 class Signature(GeneralClass):
@@ -75,7 +90,7 @@ class Signature(GeneralClass):
             Prove provided by the PhoenixBuilder Auth server.
                 Note: You don't know what "prove: str" is?
                 If you go to the beginning of this file, 
-                there's a comment there, then you will get 
+                there's a large comment there, then you will get 
                 what you want. Same as following
         `signer: str`
             Signer of this BDX file
