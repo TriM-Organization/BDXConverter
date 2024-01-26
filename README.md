@@ -228,9 +228,9 @@ class GeneralClass:
 
 
 # 关于 `PhoenixBuilder`
-`PhoenixBuilder` 客户端本身不需要付费,验证服务需要付费。如果您需要使用`PhoenixBuilder` 导入/导出,
+`PhoenixBuilder` 客户端本身不需要付费,验证服务需要付费。如果您需要使用 `PhoenixBuilder` 导入/导出,
 
-需要找 `PhoenixBuilder` 的代理或者在 `PhoenixBuilder` 用户中心中购买。这里提供了一个 `PhoenixBuilder`代理的联系方式
+需要找 PhoenixBuilder 的代理或者在 PhoenixBuilder 用户中心中购买。这里提供了一个 PhoenixBuilder 代理的联系方式
 
 QQ号:121980156
 
