@@ -150,7 +150,7 @@
 
 我们配置了自动化 `CD/CI 工作流` ，因此如果您是本项目的 `协作者` ，您可以通过更改 `version` 文件或通过手动触发的方式启动工作流，它会自动编译本项目并将将其上载到 `Pypi` 中。
 
-_[注：我们建议您在 `Python 3.10` 及以上的版本使用本项目，`3.7` 及以下的版本已不再受到 `Python` 的维护和更新,`3.8`版本在 2024年10月份停止维护()]_
+_[注：我们建议您在 `Python 3.10` 及以上的版本使用本项目，`3.7` 及以下的版本已不再受到 `Python` 的维护和更新，`3.8` 版本将在 `2024` 年的 `10` 月份停止维护]_
 
 
 
@@ -228,13 +228,6 @@ class GeneralClass:
 
 
 # 关于 `PhoenixBuilder`
-`PhoenixBuilder` 客户端本身不需要付费,验证服务需要付费。如果您需要使用 `PhoenixBuilder` 导入/导出,
-
-需要找 PhoenixBuilder 的代理或者在 PhoenixBuilder 用户中心中购买。这里提供了一个 PhoenixBuilder 代理的联系方式
-
-QQ号:121980156
-
-
 - 您可以通过此链接访问 `PhoenixBuilder` 的存储库
    - [`PhoenixBuilder`](https://github.com/LNSSPsd/PhoenixBuilder/)
 - 您可以通过下述链接访问 `PhoenixBuilder` 的相关网站
