@@ -30,10 +30,10 @@ class GeneralClass:
         if 'operationNumber' in self.__dict__:
             jsonDict['operationNumber'] = self.__dict__['operationNumber']
             jsonDict['operationName'] = self.__dict__['operationName']
-        if 'operationData' in self.__dict__:
-            for i in self.__dict__['operationData']:
-                if i in jsonDict:
-                    self.__dict__['operationData'][i] = jsonDict[i]
+        if 'operationData' in jsonDict:
+            for i in self.__dict__:
+                if i in jsonDict['operationData']:
+                    self.__dict__[i] = jsonDict['operationData'][i]
         else:
             for i in self.__dict__:
                 if i in jsonDict:

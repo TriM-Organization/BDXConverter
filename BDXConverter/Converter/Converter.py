@@ -109,7 +109,7 @@ class BDX(GeneralClass):
                     continue
                 commandId: int = i['operationNumber']
                 struct: GeneralClass = deepcopy(BDXCommandPool[commandId])
-                struct.Loads(i['operationData'])
+                struct.Loads(i)
                 self.BDXContents.append(struct)
 
     def Dumps(self) -> dict:
