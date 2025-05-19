@@ -35,7 +35,6 @@
 - [第三方依赖](#第三方依赖)
 - [特性](#特性)
 - [什么是 `BDX` 文件](#什么是-bdx-文件)
-- [关于 `PhoenixBuilder`](#关于-phoenixbuilder)
 - [待办列表](#待办列表)
 - [其他](#其他)
 
@@ -221,18 +220,7 @@ class GeneralClass:
 # 什么是 `BDX` 文件
 `PhoenixBuilder` 是一个用于 `网易我的世界中国版 · 基岩版租赁服` 的商业化快速建造器，而 `BDX` 文件则是此建造器用于存储 `Minecraft` 建筑结构的 `私有文件格式` 。
 
-如果您希望解析 `BDX` 文件，敬请参阅 [`bdump-cn.md`](https://github.com/LNSSPsd/PhoenixBuilder/blob/main/docs/bdump/bdump-cn.md) 。
-
-
-
-
-
-# 关于 `PhoenixBuilder`
-- 您可以通过此链接访问 `PhoenixBuilder` 的存储库
-   - [`PhoenixBuilder`](https://github.com/LNSSPsd/PhoenixBuilder/)
-- 您可以通过下述链接访问 `PhoenixBuilder` 的相关网站
-   - [`用户中心`](https://user.fastbuilder.pro/)
-   - [`官方网站`](https://fastbuilder.pro/)
+如果您希望解析 `BDX` 文件，敬请参阅 [`bdump-cn.md`](https://github.com/Happy2018new/bdump-docs/blob/main/docs/bdump-cn.md) 。
 
 
 
